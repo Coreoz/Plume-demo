@@ -1,5 +1,8 @@
 package org.plume.demo.guice;
 
+import org.glassfish.jersey.server.ResourceConfig;
+import org.plume.demo.jersey.JerseyConfigProvider;
+
 import com.coreoz.plume.conf.guice.GuiceConfModule;
 import com.coreoz.plume.db.querydsl.guice.GuiceQuerydslModule;
 import com.coreoz.plume.jersey.guice.GuiceJacksonModule;
@@ -15,6 +18,8 @@ public class ApplicationModule extends AbstractModule {
 		install(new GuiceConfModule());
 		install(new GuiceJacksonModule());
 		install(new GuiceQuerydslModule());
+
+		bind(ResourceConfig.class).toProvider(JerseyConfigProvider.class);
 	}
 
 }
