@@ -10,7 +10,6 @@ import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.plume.demo.WebApplication;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import com.coreoz.plume.jersey.grizzly.GrizzlyErrorPageHandler;
@@ -47,14 +46,14 @@ public class GrizzlySetup {
 
 		// webjars for swagger ui
 		HttpHandler webJarHandler = new CLStaticHttpHandler(
-			Thread.currentThread().getContextClassLoader(),
+			GrizzlySetup.class.getClassLoader(),
 			"META-INF/resources/webjars/"
 		);
 		httpServer.getServerConfiguration().addHttpHandler(webJarHandler, "/webjars/");
 
 		// static resources
 		HttpHandler httpHandler = new CLStaticHttpHandler(
-			WebApplication.class.getClassLoader(),
+			GrizzlySetup.class.getClassLoader(),
 			"/statics/"
 		);
 		httpServer.getServerConfiguration().addHttpHandler(httpHandler);
