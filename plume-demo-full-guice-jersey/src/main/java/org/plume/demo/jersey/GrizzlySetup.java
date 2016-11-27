@@ -20,13 +20,20 @@ import com.coreoz.plume.jersey.grizzly.GrizzlyErrorPageHandler;
  */
 public class GrizzlySetup {
 
-	public static void start(ResourceConfig jerseyResourceConfig) throws IOException {
+	private static final int DEFAULT_HTTP_PORT = 8080;
+	private static final String DEFAULT_HTTP_HOST = "0.0.0.0";
+
+	public static void start(ResourceConfig jerseyResourceConfig, String httpPort, String httpHost)
+			throws IOException {
 		// replace JUL logger (used by Grizzly) by SLF4J logger
 		SLF4JBridgeHandler.removeHandlersForRootLogger();
 		SLF4JBridgeHandler.install();
 
+		int httpPortToUse = httpPort == null ? DEFAULT_HTTP_PORT : Integer.parseInt(httpPort);
+		String httpHostToUse = httpHost == null ? DEFAULT_HTTP_HOST : httpHost;
+
 		// create the server
-		URI baseUri = UriBuilder.fromUri("http://localhost/api").port(8080).build();
+		URI baseUri = UriBuilder.fromUri("http://"+httpHostToUse+"/api").port(httpPortToUse).build();
 		HttpServer httpServer = GrizzlyHttpServerFactory.createHttpServer(
 			baseUri,
 			jerseyResourceConfig,

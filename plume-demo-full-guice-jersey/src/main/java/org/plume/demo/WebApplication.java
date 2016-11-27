@@ -30,7 +30,11 @@ public class WebApplication {
 		// enable Jersey to create objects through Guice Injector instance
 		jerseyResourceConfig.register(new JerseyGuiceFeature(injector));
 		// starts the server
-		GrizzlySetup.start(jerseyResourceConfig);
+		GrizzlySetup.start(
+			jerseyResourceConfig,
+			System.getProperty("http.port"),
+			System.getProperty("http.address")
+		);
 
 		logger.info("Server started in {} ms", System.currentTimeMillis() - startTimestamp);
 	}
