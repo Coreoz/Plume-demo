@@ -10,7 +10,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.plume.demo.services.configuration.ConfigurationService;
-import org.plume.demo.webservices.api.beans.Test;
+import org.plume.demo.webservices.api.data.Test;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

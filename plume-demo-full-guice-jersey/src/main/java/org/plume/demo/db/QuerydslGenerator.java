@@ -21,6 +21,11 @@ import com.querydsl.sql.types.JSR310LocalTimeType;
 import com.querydsl.sql.types.JSR310ZonedDateTimeType;
 import com.querydsl.sql.types.Type;
 
+/**
+ * Generate Querydsl classes for the database layer.
+ *
+ * Run the {@link #main(String...)} method from your IDE to regenerate Querydsl classes.
+ */
 public class QuerydslGenerator {
 
 	private static final String TABLES_PREFIX = "plm_";
@@ -69,7 +74,7 @@ public class QuerydslGenerator {
 		});
 	}
 
-	static Type<?> classType(Class<?> classType) {
+	private static Type<?> classType(Class<?> classType) {
 		try {
 			return (Type<?>) classType.newInstance();
 		} catch (Exception e) {

@@ -1,4 +1,4 @@
-package org.plume.demo.webservices.api.beans;
+package org.plume.demo.webservices.api.data;
 
 public class Test {
 
