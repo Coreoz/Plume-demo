@@ -1,7 +1,7 @@
 A demo application of the whole Plume ecosystem
 ===============================================
 
-**While usable, this demo is not finished yet, the administration part miss the UI interface**
+**While usable, this demo is not finished yet, the administration part misses the UI interface**
 
 Running the application
 -----------------------
