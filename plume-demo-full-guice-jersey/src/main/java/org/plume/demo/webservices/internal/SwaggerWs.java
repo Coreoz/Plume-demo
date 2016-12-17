@@ -9,11 +9,11 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import org.plume.demo.services.configuration.ConfigurationService;
+
 import com.coreoz.plume.jersey.security.basic.BasicAuthenticator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Throwables;
-
-import org.plume.demo.services.configuration.ConfigurationService;
 
 import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.models.Swagger;
@@ -32,7 +32,7 @@ public class SwaggerWs {
 		beanConfig.setResourcePackage("org.plume.demo.webservices.api");
 		beanConfig.setBasePath("/api");
 		beanConfig.setTitle("API plume-demo-full-guice-jersey");
-		// this is not only a setter, it also starts the Swagger classes analyzing process 
+		// this is not only a setter, it also starts the Swagger classes analyzing process
 		beanConfig.setScan(true);
 
 		// the swagger object can be changed to add security definition
@@ -50,7 +50,7 @@ public class SwaggerWs {
 		this.basicAuthenticator = BasicAuthenticator.fromSingleCredentials(
 			configurationService.swaggerAccessUsername(),
 			configurationService.swaggerAccessPassword(),
-			"API plume-demo-full-guice-jersey"
+			"Plume demo API"
 		);
 	}
 

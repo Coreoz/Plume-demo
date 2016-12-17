@@ -6,6 +6,7 @@ import javax.inject.Singleton;
 
 import org.glassfish.jersey.server.ResourceConfig;
 
+import com.coreoz.plume.admin.webservices.security.AdminSecurityFeature;
 import com.coreoz.plume.jersey.errors.WsResultExceptionMapper;
 import com.coreoz.plume.jersey.java8.TimeParamProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,10 +26,14 @@ public class JerseyConfigProvider implements Provider<ResourceConfig> {
 
 		// this package will be scanned by Jersey to discover web-service classes
 		config.packages("org.plume.demo.webservices");
+		// admin web-services
+		config.packages("com.coreoz.plume.admin.webservices");
 
 		// filters configuration
 		// handle errors and exceptions
 		config.register(WsResultExceptionMapper.class);
+		// admin web-services protection with the permission system
+		config.register(AdminSecurityFeature.class);
 		// to debug web-service requests
 		// register(LoggingFilter.class);
 
