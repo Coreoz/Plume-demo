@@ -1,8 +1,13 @@
 package org.plume.demo.jersey;
 
+import java.io.IOException;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
 
 import org.glassfish.jersey.server.ResourceConfig;
 
@@ -23,6 +28,19 @@ public class JerseyConfigProvider implements Provider<ResourceConfig> {
 	@Inject
 	public JerseyConfigProvider(ObjectMapper objectMapper) {
 		config = new ResourceConfig();
+
+		// to run the admin ui app separately, if included the java project,
+		// these lines can be deleted
+		config.register(new ContainerResponseFilter() {
+			@Override
+			public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
+					throws IOException {
+				responseContext.getHeaders().add("Access-Control-Allow-Origin", "*");
+				responseContext.getHeaders().add("Access-Control-Allow-Headers", "origin, content-type, accept, authorization");
+				responseContext.getHeaders().add("Access-Control-Allow-Credentials", "true");
+				responseContext.getHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
+			}
+		});
 
 		// this package will be scanned by Jersey to discover web-service classes
 		config.packages("org.plume.demo.webservices");
