@@ -52,10 +52,13 @@ public class GrizzlySetup {
 		httpServer.getServerConfiguration().addHttpHandler(webJarHandler, "/webjars/");
 
 		// static resources
-		HttpHandler httpHandler = new CLStaticHttpHandler(
+		CLStaticHttpHandler httpHandler = new CLStaticHttpHandler(
 			GrizzlySetup.class.getClassLoader(),
 			"/statics/"
 		);
+		// enable to view changes on a dev environnement when the project is run in debug mode ;
+		// in production, statics assets should be served by apache or nginx
+		httpHandler.setFileCacheEnabled(false);
 		httpServer.getServerConfiguration().addHttpHandler(httpHandler);
 
 		httpServer.start();
