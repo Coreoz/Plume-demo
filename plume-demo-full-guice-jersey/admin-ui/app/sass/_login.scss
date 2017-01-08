@@ -1,0 +1,52 @@
+#login-container {
+	@include flexbox;
+	@include flex-direction(column);
+	@include align-items(center);
+	@include justify-content(center);
+
+	@include make-container;
+
+	margin-top: 4rem;
+
+	h1 {
+		margin-bottom: 2rem;
+	}
+
+	h2 {
+		margin-bottom: 1.5rem;
+	}
+
+	form {
+		width: 24rem;
+
+		.btn,
+		.form-control {
+			padding: 1rem;
+		}
+
+		.btn {
+			width: 100%;
+		}
+
+		.field-group {
+			margin-bottom: 2rem;
+
+			.form-control:first-child {
+				margin-bottom: -1px;
+			}
+		}
+
+		.errors {
+			text-align: center;
+			color: $brand-danger;
+			margin: 1rem 0;
+		}
+	}
+
+	@include media-breakpoint-down(sm) {
+		form {
+			width: 100%;
+		}
+	}
+
+}

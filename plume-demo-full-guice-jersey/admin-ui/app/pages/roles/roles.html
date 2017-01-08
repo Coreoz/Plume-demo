@@ -1,0 +1,10 @@
+<div ng-controller="rolesController as ctrl">
+	<h1 class="content-title">Roles</h1>
+
+	<div class="content">
+		<div class="row">
+			<div class="col-sm-6" ng-include="'app/pages/roles/role-list.html'"></div>
+			<div class="col-sm-6" ng-show="ctrl.edition" ng-include="'app/pages/roles/role-detail.html'"></div>
+		</div>
+	</div>
+</div>

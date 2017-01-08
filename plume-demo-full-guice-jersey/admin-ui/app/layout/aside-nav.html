@@ -1,0 +1,24 @@
+<ul class="nav nav-pills nav-stacked" ng-controller="sideMenuDropdownController">
+    <li class="nav-item">
+        <a ui-sref-active="active" ui-sref="app.home" class="nav-link">
+            <i class="fa fa-home icon"></i>
+            {{ 'aside.nav.HOME' | translate }}
+        </a>
+    </li>
+
+    <!-- users -->
+    <li class="nav-item dropdown" ng-show="hasPermission('MANAGE_USERS') || hasPermission('MANAGE_ROLES')">
+        <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button">
+            <i class="fa fa-users icon"></i>
+            {{ 'aside.nav.USERS' | translate }}
+        </a>
+        <div class="dropdown-menu">
+            <a class="dropdown-item" ui-sref-active="active" ui-sref="app.users.list" ng-show="hasPermission('MANAGE_USERS')">
+                {{ 'aside.nav.USERS' | translate }}
+            </a>
+            <a class="dropdown-item" ui-sref-active="active" ui-sref="app.roles" ng-show="hasPermission('MANAGE_ROLES')">
+                {{ 'aside.nav.ROLES' | translate }}
+            </a>
+        </div>
+    </li>
+</ul>

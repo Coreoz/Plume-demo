@@ -1,0 +1,38 @@
+<div ng-controller="usersListController as ctrl">
+	<h1 class="content-title">{{ 'users.TITLE' | translate }}</h1>
+
+	<div class="content">
+		<plm-panel title="{{'users.LIST_TITLE'|translate}}">
+			<plm-panel-body>
+				<div class="table-responsive" ng-show="ctrl.users.length > 0">
+					<table st-table="ctrl.displayedUsers" st-safe-src="ctrl.users" class="table table-striped">
+						<thead>
+						<tr>
+							<th st-sort="userName">{{ 'users.USERNAME' | translate }}</th>
+							<th st-sort="email">{{ 'users.EMAIL' | translate }}</th>
+							<th st-sort="firstName">{{ 'users.FIRSTNAME' | translate }}</th>
+							<th st-sort="lastName">{{ 'users.LASTNAME' | translate }}</th>
+						</tr>
+						</thead>
+
+						<tbody>
+						<tr ng-repeat="row in ctrl.displayedUsers" style="cursor: pointer" ng-click="ctrl.displayUser(row.id)">
+							<td>{{row.userName}}</td>
+							<td>{{row.email}}</td>
+							<td>{{row.firstName}}</td>
+							<td>{{row.lastName}}</td>
+						</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<div ng-show="ctrl.users.length == 0">
+					{{ 'users.EMPTY' | translate }}
+				</div>
+			</plm-panel-body>
+			<plm-panel-footer>
+				<a ui-sref="app.users.create()" class="btn btn-primary">{{ 'actions.NEW' | translate }}</a>
+			</plm-panel-footer>
+		</plm-panel>
+	</div>
+</div>

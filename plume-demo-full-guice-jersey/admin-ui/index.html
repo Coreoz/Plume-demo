@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="{{lang}}" ng-app="admin">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+
+	<title>Plume Admin UI</title>
+
+	<link rel="icon" type="image/png" href="app/img/favicon.png" />
+
+	<link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css" type="text/css" />
+	<link rel="stylesheet" href="node_modules/ng-dialog/css/ngDialog.min.css" type="text/css" />
+	<link rel="stylesheet" href="node_modules/ng-dialog/css/ngDialog-theme-default.min.css" type="text/css" />
+	<link rel="stylesheet" href="app/css/app.css">
+	
+	<script src="app/app.const.js" data-build="exclude"></script>
+</head>
+<body>
+	<div id="app" ui-view></div>
+
+	<!-- bootstrap -->
+	<script src="node_modules/jquery/dist/jquery.min.js"></script>
+	<script src="node_modules/tether/dist/js/tether.min.js"></script>
+	<script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+
+	<!-- i18n -->
+	<script src="app/i18n/fr.js"></script>
+	<script src="app/i18n/en.js"></script>
+	
+	<!-- angular -->
+	<script src="node_modules/angular/angular.js"></script>
+	<script src="node_modules/angular-resource/angular-resource.js"></script>
+	<script src="node_modules/angular-ui-router/release/angular-ui-router.js"></script>
+	<script src="node_modules/angular-translate/dist/angular-translate.min.js"></script>
+	<script src="node_modules/ngstorage/ngStorage.min.js"></script>
+	<script src="node_modules/angularjs-toaster/toaster.min.js"></script>
+	<script src="node_modules/angular-smart-table/dist/smart-table.min.js"></script>
+	<script src="node_modules/ng-dialog/js/ngDialog.min.js"></script>
+
+	<!-- app config -->
+	<script src="app/app.js"></script>
+	<script src="app/app.router.js"></script>
+	<script src="app/layout/main.js"></script>
+
+	<!-- directives -->
+	<script src="app/directives/panel/plm-panel.js"></script>
+	<script src="app/directives/media/plm-media.js"></script>
+
+	<!-- generic services -->
+	<script src="app/services/i18nService.js"></script>
+	<script src="app/services/uiService.js"></script>
+	<script src="app/services/httpInterceptor.js"></script>
+	<script src="app/services/sessionService.js"></script>
+
+	<!-- generic controllers -->
+	<script src="app/controllers/sideMenuController.js"></script>
+
+	<!-- login -->
+	<script src="app/pages/login/loginService.js"></script>
+	<script src="app/pages/login/login.js"></script>
+
+	<!-- users -->
+	<script src="app/pages/users/userService.js"></script>
+	<script src="app/pages/users/users.js"></script>
+
+	<!-- roles -->
+	<script src="app/pages/roles/roleService.js"></script>
+	<script src="app/pages/roles/roles.js"></script>
+</body>
+</html>

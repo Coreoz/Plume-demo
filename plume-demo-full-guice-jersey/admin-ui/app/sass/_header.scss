@@ -1,0 +1,81 @@
+#app &>.admin-container > header {
+
+  #site-logo,
+  #header-nav,
+  #aside-nav-toggle {
+    @include flexbox;
+    @include flex-direction(row);
+    @include align-items(center);
+
+    padding: 0.5rem 0;
+  }
+
+  #site-logo {
+    @include justify-content(center);
+
+    .site-name {
+      margin-left: 1rem;
+      font-weight: bold;
+    }
+  }
+
+  #header-nav {
+    background: #fff;
+
+    @include justify-content(flex-end);
+
+    .nav-pills {
+      a {
+        color: $gray;
+        @include hover-focus-active {
+          color: $gray-dark;
+        }
+      }
+
+      .nav-link.active,
+      .nav-item.open .nav-link {
+        @include plain-hover-focus {
+          color: $gray-dark;
+          background-color: transparent;
+        }
+      }
+    }
+  }
+
+  #aside-nav-toggle {
+    display: none;
+    margin-left: 1rem;
+
+    .btn {
+      background: #fff;
+
+      &:hover,
+      &.active {
+        background: $gray-lighter;
+      }
+    }
+  }
+
+  @include media-breakpoint-down(sm) {
+    background: #ffffff;
+
+    #aside-nav-toggle {
+      @include flexbox;
+    }
+
+    &>#site-logo {
+      @include flex(1, 0, auto);
+      width: auto;
+      background: transparent;
+    }
+
+    .site-name {
+      display: none;
+    }
+
+    &>#header-nav {
+      @include flex(0, 0, auto);
+    }
+  }
+
+}

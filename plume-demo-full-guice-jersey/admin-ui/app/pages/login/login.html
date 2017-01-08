@@ -1,0 +1,14 @@
+<div id="login-container" ng-controller="loginController as loginCtrl">
+	<h1>Plume Admin UI</h1>
+	<h2>{{ 'login.TITLE' | translate }}</h2>
+	<form ng-submit="loginCtrl.login(loginCtrl.username)">
+		<div class="errors" ng-show="loginCtrl.errorMessage">
+			{{loginCtrl.errorMessage}}
+		</div>
+		<div class="field-group">
+			<input type="text" class="form-control" ng-model="loginCtrl.user.userName" placeholder="{{ 'login.IDENTIFIER' | translate }}" required autofocus>
+			<input type="password" class="form-control" ng-model="loginCtrl.user.password" placeholder="{{ 'login.PASSWORD' | translate }}" required>
+		</div>
+		<button type="submit" class="btn btn-primary">{{ 'login.SIGNIN' | translate }}</button>
+	</form>
+</div>

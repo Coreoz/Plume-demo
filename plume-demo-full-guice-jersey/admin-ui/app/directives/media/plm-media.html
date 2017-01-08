@@ -1,0 +1,20 @@
+<div>
+	<div class="btn-group">
+		<a class="btn btn-icon btn-success"
+			target="_blank" ng-href="{{currentMediaUrl}}" ng-show="currentMediaUrl">
+			<i class="fa fa-download" aria-hidden="true"></i>
+		</a>
+		<label class="btn btn-primary">
+			Select a file...
+			<input class="media-file-input"
+			accept="{{accept}}" type="file"
+			ng-model="mediaModel" base-sixty-four-input>
+		</label>
+	</div>
+	<div ng-show="filename">
+		{{ filename }}
+	</div>
+	<div ng-show="isImage && previewHref">
+		<img class="media-preview" ng-src="{{previewHref}}" />
+	</div>
+</div>

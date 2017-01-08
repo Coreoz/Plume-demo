@@ -1,0 +1,57 @@
+#app {
+  margin: 0;
+  height: 100vh;
+  overflow: auto;
+
+  &>.admin-container {
+    min-height: 100vh;
+
+    @include flexbox;
+    @include flex-direction(column);
+
+    &>.admin-content-container,
+    &>header {
+      @include flexbox;
+      @include flex-direction(row);
+
+      &>#aside-nav,
+      &>#site-logo {
+        width: $left-menu-nav-width;
+        background: $gray-darker;
+        color: $gray-lightest;
+
+        &>.nav-item {
+          background: $gray-darker;
+          color: $gray-lightest;
+        }
+      }
+
+      &>#header-nav,
+      &>main {
+        @include flex(1, 0, auto);
+      }
+    }
+
+    &>.admin-content-container {
+      @include flex(1, 0, auto);
+    }
+
+    @include media-breakpoint-down(sm) {
+      &>.admin-content-container {
+        position: relative;
+
+        &>#aside-nav {
+          display: none;
+
+          &.aside-nav-active {
+            display: block;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            z-index: 1;
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,56 @@
+#aside-nav {
+  a {
+    color: $gray-lighter;
+    border-radius: 0;
+  }
+
+  .icon {
+    margin-right: 1rem;
+  }
+
+  .nav-item {
+    margin: 0;
+  }
+
+  .nav-link {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+
+  .nav-link,
+  .dropdown-item {
+    &:hover {
+      color: #ffffff;
+      font-weight: bold;
+      background: $gray;
+    }
+    &.active {
+      color: #ffffff;
+      font-weight: normal;
+      background: $brand-primary;
+    }
+  }
+
+  .dropdown {
+    &.open >.nav-link {
+      color: #ffffff;
+      font-weight: normal;
+      background: $gray-dark;
+    }
+
+    .dropdown-menu {
+      position: static;
+      float: none;
+      border: none;
+      margin: 0;
+      padding: 0;
+      border-radius: 0;
+      background: $gray-dark;
+
+      .dropdown-item {
+        padding-top: 0.8rem;
+        padding-bottom: 0.8rem;
+      }
+    }
+  }
+}

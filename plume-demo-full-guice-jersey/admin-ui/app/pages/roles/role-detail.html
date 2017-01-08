@@ -1,0 +1,52 @@
+<plm-panel title="{{ctrl.editTitle}}">
+	<plm-panel-body>
+		<form class="form-horizontal">
+			<plm-form-item label="{{ 'roles.LABEL' | translate }}">
+				<input type="text" class="form-control" ng-model="ctrl.edition.role.label" maxlength="30" size="30">
+			</plm-form-item>
+
+			<plm-form-item label="{{ 'roles.AVAILABLE' | translate }}">
+				<select class="form-control" ng-model="ctrl.edition.available.selected" size="5" multiple>
+					<option ng-repeat="permission in ctrl.edition.available.list" value="{{permission}}">
+						{{permission}}
+					</option>
+				</select>
+			</plm-form-item>
+			<plm-form-item label="" class="text-center">
+				<div>
+					<button class="btn btn-default" ng-click="ctrl.disablePermissions()">
+						<i class="fa fa-angle-up" aria-hidden="true"></i>
+					</button>
+					<button class="btn btn-default" ng-click="ctrl.disableAllPermissions()">
+						<i class="fa fa-angle-double-up" aria-hidden="true"></i>
+					</button>
+					<button class="btn btn-default" ng-click="ctrl.enablePermissions()">
+						<i class="fa fa-angle-down" aria-hidden="true"></i>
+					</button>
+					<button class="btn btn-default" ng-click="ctrl.enableAllPermissions()">
+						<i class="fa fa-angle-double-down" aria-hidden="true"></i>
+					</button>
+				</div>
+			</plm-form-item>
+			<plm-form-item label="{{ 'roles.ENABLED' | translate }}">
+				<select class="form-control" ng-model="ctrl.edition.enabled.selected" size="5" multiple>
+					<option ng-repeat="permission in ctrl.edition.enabled.list" value="{{permission}}">
+						{{permission}}
+					</option>
+				</select>
+			</plm-form-item>
+		</form>
+	</plm-panel-body>
+	<plm-panel-footer>
+		<button type="button" class="btn btn-secondary" ng-click="ctrl.cancel()">
+			{{'actions.CANCEL'|translate}}
+		</button>
+		<button type="button" class="btn btn-danger" ng-show="!ctrl.edition.role.isNew" ng-click="ctrl.delete()">
+			{{'actions.DELETE'|translate}}
+		</button>
+		<button type="button" class="btn btn-success" ng-click="ctrl.save()">
+			{{'actions.SAVE'|translate}}
+		</button>
+	</plm-panel-footer>
+</plm-panel>
+

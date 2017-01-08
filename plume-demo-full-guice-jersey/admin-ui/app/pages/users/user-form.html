@@ -1,0 +1,45 @@
+<plm-panel title="{{ctrl.title}}">
+	<form class="form-horizontal" ng-submit="ctrl.save(ctrl.user)">
+		<plm-panel-body>
+			<plm-form-item label="{{ 'users.USERNAME' | translate }}">
+				<input type="text" class="form-control" ng-model="ctrl.user.userName">
+			</plm-form-item>
+			<plm-form-item label="{{ 'users.EMAIL' | translate }}">
+				<input type="text" class="form-control" ng-model="ctrl.user.email">
+			</plm-form-item>
+			<plm-form-item label="{{ 'users.FIRSTNAME' | translate }}">
+				<input type="text" class="form-control" ng-model="ctrl.user.firstName">
+			</plm-form-item>
+			<plm-form-item label="{{ 'users.LASTNAME' | translate }}">
+				<input type="text" class="form-control" ng-model="ctrl.user.lastName">
+			</plm-form-item>
+			<plm-form-item label="{{ 'users.ROLE' | translate }}">
+				<select class="form-control" ng-model="ctrl.user.idRole">
+					<option ng-repeat="role in ctrl.rolesAvailable" value="{{role.id}}">{{role.label}}</option>
+				</select>
+			</plm-form-item>
+			<hr/>
+			<plm-form-item label="{{ 'users.PASSWORD' | translate }}">
+				<input type="password" class="form-control" ng-model="ctrl.user.password">
+			</plm-form-item>
+			<plm-form-item label="{{ 'users.PASSWORD_CONFIRM' | translate }}">
+				<input type="password" class="form-control" ng-model="ctrl.user.passwordConfirmation">
+			</plm-form-item>
+			<hr ng-hide="ctrl.user.create" />
+			<plm-form-item label="{{ 'users.CREATION_DATE' | translate }}" ng-hide="ctrl.user.create">
+				<p class="form-control-static">{{ctrl.user.creationDate | date:"yyyy/MM/dd - hh:mm"}}</p>
+			</plm-form-item>
+		</plm-panel-body>
+		<plm-panel-footer>
+			<a ui-sref="app.users.list()" class="btn btn-secondary">
+				{{ 'actions.BACK' | translate }}
+			</a>
+			<button type="submit" class="btn btn-success">
+				{{ 'actions.SAVE' | translate }}
+			</button>
+			<button type="button" class="btn btn-danger" ng-hide="ctrl.user.create" ng-click="ctrl.remove(ctrl.user)">
+				{{ 'actions.DELETE' | translate }}
+			</button>
+		</plm-panel-footer>
+	</form>
+</plm-panel>

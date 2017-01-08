@@ -1,0 +1,41 @@
+<div class="admin-container">
+	<header>
+		<div id="aside-nav-toggle" ng-controller="sideMenuController as ctrl">
+			<button type="button" class="btn" ng-click="ctrl.toggle()" ng-class="{'active': showAsideNav}">
+				<i class="fa fa-bars" aria-hidden="true"></i>
+			</button>
+		</div>
+		<div id="site-logo">
+			<img src="app/img/app-logo.png" />
+			<span class="site-name">Coreoz</span>
+		</div>
+		<div id="header-nav">
+			<ul class="nav nav-pills" ng-controller="userMenuController as ctrl">
+				<li class="nav-item dropdown">
+					<a href class="nav-link dropdown-toggle" data-toggle="dropdown" role="button">
+						<span>{{ctrl.userFullname}}</span>
+						<b class="caret"></b>
+					</a>
+
+					<div class="dropdown-menu dropdown-menu-right">
+						<a class="dropdown-item" ui-sref="access.login">
+							{{'header.LOGOUT'|translate}}
+						</a>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</header>
+
+	<div class="admin-content-container">
+		<nav
+				id="aside-nav"
+				ng-class="{'aside-nav-active': showAsideNav}"
+				ng-include="'app/layout/aside-nav.html'">
+		</nav>
+
+		<main id="main-content" ng-click="ctrl.reset()" ng-controller="sideMenuController as ctrl" ui-view></main>
+	</div>
+
+	<toaster-container></toaster-container>
+</div>

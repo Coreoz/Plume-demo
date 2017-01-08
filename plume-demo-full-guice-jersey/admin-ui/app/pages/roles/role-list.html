@@ -1,0 +1,23 @@
+<plm-panel title="{{'roles.LIST_TITLE'|translate}}">
+	<plm-panel-body>
+		<div class="table-responsive">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>{{ 'roles.LABEL' | translate }}</th>
+						<th>{{ 'roles.PERMISSIONS' | translate }}</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="role in ctrl.roles" ng-click="ctrl.edit(role)" style="cursor: pointer">
+						<td>{{role.label}}</td>
+						<td>{{role.permissions.sort().join(', ')}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</plm-panel-body>
+	<plm-panel-footer>
+		<button type="button" class="btn btn-primary" ng-click="ctrl.create()">{{'actions.NEW'|translate}}</button>
+	</plm-panel-footer>
+</plm-panel>
