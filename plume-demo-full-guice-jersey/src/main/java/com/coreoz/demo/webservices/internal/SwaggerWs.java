@@ -1,4 +1,4 @@
-package org.plume.demo.webservices.internal;
+package com.coreoz.demo.webservices.internal;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -9,8 +9,7 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import org.plume.demo.services.configuration.ConfigurationService;
-
+import com.coreoz.demo.services.configuration.ConfigurationService;
 import com.coreoz.plume.jersey.security.basic.BasicAuthenticator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Throwables;

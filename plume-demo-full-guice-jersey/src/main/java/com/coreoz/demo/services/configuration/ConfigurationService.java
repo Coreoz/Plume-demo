@@ -1,4 +1,4 @@
-package org.plume.demo.services.configuration;
+package com.coreoz.demo.services.configuration;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

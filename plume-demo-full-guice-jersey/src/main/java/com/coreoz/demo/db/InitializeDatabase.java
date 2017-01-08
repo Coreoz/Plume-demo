@@ -1,4 +1,4 @@
-package org.plume.demo.db;
+package com.coreoz.demo.db;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

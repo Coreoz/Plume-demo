@@ -1,4 +1,4 @@
-package org.plume.demo.jersey;
+package com.coreoz.demo.jersey;
 
 import java.io.IOException;
 import java.net.URI;

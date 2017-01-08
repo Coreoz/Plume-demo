@@ -159,6 +159,15 @@
 			<groupId>com.coreoz</groupId>
 			<artifactId>plume-admin</artifactId>
 		</dependency>
+		
+		<dependency>
+			<groupId>com.coreoz</groupId>
+			<artifactId>plume-file-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.coreoz</groupId>
+			<artifactId>plume-file-gallery</artifactId>
+		</dependency>
 
 		<!-- unit testing -->
 		<dependency>

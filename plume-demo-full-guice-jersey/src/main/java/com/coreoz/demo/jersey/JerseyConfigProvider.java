@@ -1,4 +1,4 @@
-package org.plume.demo.jersey;
+package com.coreoz.demo.jersey;
 
 import java.io.IOException;
 
@@ -9,9 +9,15 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.process.internal.RequestScoped;
 import org.glassfish.jersey.server.ResourceConfig;
 
+import com.coreoz.plume.admin.jersey.WebSessionPermission;
+import com.coreoz.plume.admin.webservices.context.WebSessionAdminFactory;
 import com.coreoz.plume.admin.webservices.security.AdminSecurityFeature;
+import com.coreoz.plume.file.gallery.webservices.FileGalleryAdminWs;
+import com.coreoz.plume.file.webservices.FileWs;
 import com.coreoz.plume.jersey.errors.WsResultExceptionMapper;
 import com.coreoz.plume.jersey.java8.TimeParamProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,9 +49,20 @@ public class JerseyConfigProvider implements Provider<ResourceConfig> {
 		});
 
 		// this package will be scanned by Jersey to discover web-service classes
-		config.packages("org.plume.demo.webservices");
+		config.packages("com.coreoz.demo.webservices");
 		// admin web-services
 		config.packages("com.coreoz.plume.admin.webservices");
+		// plume file
+		config.register(FileWs.class);
+		// plume media gallery
+		config.register(FileGalleryAdminWs.class);
+		// enable to fetch the current user as a web-service parameter
+		config.register(new AbstractBinder() {
+			@Override
+			protected void configure() {
+				bindFactory(WebSessionAdminFactory.class).to(WebSessionPermission.class).in(RequestScoped.class);
+			}
+		});
 
 		// filters configuration
 		// handle errors and exceptions

@@ -1,13 +1,13 @@
-package org.plume.demo;
+package com.coreoz.demo;
 
 import java.io.IOException;
 
 import org.glassfish.jersey.server.ResourceConfig;
-import org.plume.demo.guice.ApplicationModule;
-import org.plume.demo.jersey.GrizzlySetup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.coreoz.demo.guice.ApplicationModule;
+import com.coreoz.demo.jersey.GrizzlySetup;
 import com.coreoz.plume.jersey.guice.JerseyGuiceFeature;
 import com.google.inject.Guice;
 import com.google.inject.Injector;

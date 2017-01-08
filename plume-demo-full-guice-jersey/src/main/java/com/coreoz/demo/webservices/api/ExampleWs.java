@@ -1,4 +1,4 @@
-package org.plume.demo.webservices.api;
+package com.coreoz.demo.webservices.api;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -9,8 +9,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.plume.demo.services.configuration.ConfigurationService;
-import org.plume.demo.webservices.api.data.Test;
+import com.coreoz.demo.services.configuration.ConfigurationService;
+import com.coreoz.demo.webservices.api.data.Test;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
