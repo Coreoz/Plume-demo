@@ -3,7 +3,8 @@ var translations_en = {
 		"nav" : {
 			"USERS" : "Users",
 			"ROLES" : "Roles",
-			"HOME" : "Home"
+			"HOME" : "Home",
+			"CITIES": "Cities"
 		}
 	},
 	"header" : {

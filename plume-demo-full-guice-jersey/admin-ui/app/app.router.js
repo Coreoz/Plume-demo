@@ -52,6 +52,25 @@ app.config(function($stateProvider, $urlRouterProvider) {
 			url: '/roles',
 			templateUrl: 'app/pages/roles/roles.html'
 		})
+
+		// cities
+		.state('app.cities', {
+			abstract : true,
+			url : '/cities',
+			template : '<div ui-view></div>'
+		})
+		.state('app.cities.list', {
+			url : '/',
+			templateUrl : 'app/pages/cities/city-list.html'
+		})
+		.state('app.cities.create', {
+			url : '/new',
+			templateUrl : 'app/pages/cities/city-detail.html'
+		})
+		.state('app.cities.detail', {
+			url : '/:cityId',
+			templateUrl : 'app/pages/cities/city-detail.html'
+		})
 		
 		;
 });

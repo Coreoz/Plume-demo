@@ -1,0 +1,23 @@
+<div ng-controller="citiesListController as ctrl">
+	<h1 class="content-title">{{ 'cities.TITLE' | translate }}</h1>
+
+	<div class="content">
+		<a ng-repeat="city in cities" ng-click="ctrl.display(city.data.id)">
+			<div class="card"  ng-class="{'inactive': !city.data.active}">
+				<img class="card-img-top" ng-src="{{city.cityImageUrl}}" alt="City image">
+				<div class="card-block">
+					<p class="card-text">{{city.data.name}}<p>
+				</div>
+			</div>
+		</a>
+
+		<a ui-sref="app.cities.create" ng-if="hasPermission('CITIES_ALTER')">
+			<div class="card"  ng-class="{'inactive': !city.data.active}">
+				<div class="card-block">
+					<p class="card-text">{{ 'cities.ADD' | translate }}<p>
+				</div>
+			</div>
+		</a>
+	</div>
+</div>
+
