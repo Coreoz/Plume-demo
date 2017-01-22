@@ -6,7 +6,7 @@
     </encoder>
   </appender>
   
-  <logger name="org.plume.demo" level="DEBUG"/>
+  <logger name="com.coreoz.demo" level="DEBUG"/>
   
   <root level="INFO">
     <appender-ref ref="STDOUT" />

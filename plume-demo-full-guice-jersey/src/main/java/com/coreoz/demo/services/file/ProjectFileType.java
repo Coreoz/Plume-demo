@@ -1,7 +1,7 @@
 package com.coreoz.demo.services.file;
 
 import com.coreoz.demo.db.generated.QCity;
-import com.coreoz.plume.file.services.fileType.FileType;
+import com.coreoz.plume.file.services.filetype.FileType;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.sql.RelationalPathBase;
 

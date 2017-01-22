@@ -9,7 +9,6 @@ import com.coreoz.plume.db.guice.DataSourceModule;
 import com.coreoz.plume.db.querydsl.generation.IdBeanSerializer;
 import com.coreoz.plume.db.transaction.TransactionManager;
 import com.coreoz.plume.file.db.querydsl.FileEntityQuerydsl;
-import com.google.common.base.Throwables;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.querydsl.codegen.EntityType;
@@ -82,8 +81,8 @@ public class QuerydslGenerator {
 	private static Type<?> classType(Class<?> classType) {
 		try {
 			return (Type<?>) classType.newInstance();
-		} catch (Exception e) {
-			throw Throwables.propagate(e);
+		} catch (InstantiationException | IllegalAccessException e) {
+			throw new RuntimeException(e);
 		}
 	}
 

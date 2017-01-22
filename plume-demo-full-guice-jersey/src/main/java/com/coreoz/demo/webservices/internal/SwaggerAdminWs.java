@@ -17,7 +17,6 @@ import com.coreoz.plume.admin.services.permissions.AdminPermissions;
 import com.coreoz.plume.admin.webservices.SessionWs;
 import com.coreoz.plume.jersey.security.basic.BasicAuthenticator;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
 
 import io.swagger.jaxrs.config.BeanConfig;
@@ -55,7 +54,7 @@ public class SwaggerAdminWs {
 					.build();
 			}
 		};
-		beanConfig.setResourcePackage("org.plume.demo.webservices.admin");
+		beanConfig.setResourcePackage("com.coreoz.demo.webservices.admin");
 		beanConfig.setBasePath("/api");
 		beanConfig.setTitle("Plume Demo Admin API");
 		// this is not only a setter, it also starts the Swagger classes analyzing process
@@ -73,7 +72,7 @@ public class SwaggerAdminWs {
 		try {
 			this.swaggerDefinition = Json.mapper().writeValueAsString(swagger);
 		} catch (JsonProcessingException e) {
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 
 		// require authentication to access the API documentation

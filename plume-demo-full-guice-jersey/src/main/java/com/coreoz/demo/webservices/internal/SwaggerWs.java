@@ -12,7 +12,6 @@ import javax.ws.rs.core.MediaType;
 import com.coreoz.demo.services.configuration.ConfigurationService;
 import com.coreoz.plume.jersey.security.basic.BasicAuthenticator;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.base.Throwables;
 
 import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.models.Swagger;
@@ -28,7 +27,7 @@ public class SwaggerWs {
 	@Inject
 	public SwaggerWs(ConfigurationService configurationService) {
 		BeanConfig beanConfig = new BeanConfig();
-		beanConfig.setResourcePackage("org.plume.demo.webservices.api");
+		beanConfig.setResourcePackage("com.coreoz.demo.webservices.api");
 		beanConfig.setBasePath("/api");
 		beanConfig.setTitle("API plume-demo-full-guice-jersey");
 		// this is not only a setter, it also starts the Swagger classes analyzing process
@@ -42,7 +41,7 @@ public class SwaggerWs {
 		try {
 			this.swaggerDefinition = Json.mapper().writeValueAsString(swagger);
 		} catch (JsonProcessingException e) {
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 
 		// require authentication to access the API documentation

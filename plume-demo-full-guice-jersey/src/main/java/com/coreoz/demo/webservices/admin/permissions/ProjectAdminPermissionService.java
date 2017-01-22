@@ -9,7 +9,6 @@ import javax.inject.Singleton;
 
 import com.coreoz.plume.admin.services.permissions.AdminPermissionService;
 import com.coreoz.plume.admin.services.permissions.AdminPermissionServiceBasic;
-import com.google.common.base.Throwables;
 
 @Singleton
 public class ProjectAdminPermissionService implements AdminPermissionService {
@@ -23,8 +22,8 @@ public class ProjectAdminPermissionService implements AdminPermissionService {
 				.map(field -> {
 					try {
 						return (String) field.get(null);
-					} catch (Exception e) {
-						throw Throwables.propagate(e);
+					} catch (IllegalAccessException e) {
+						throw new RuntimeException(e);
 					}
 				})
 				.collect(Collectors.toSet());

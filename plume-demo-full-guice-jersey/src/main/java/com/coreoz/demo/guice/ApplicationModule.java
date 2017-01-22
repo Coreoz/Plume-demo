@@ -15,10 +15,10 @@ import com.coreoz.plume.conf.guice.GuiceConfModule;
 import com.coreoz.plume.db.guice.DataSourceModule;
 import com.coreoz.plume.db.querydsl.guice.GuiceQuerydslModule;
 import com.coreoz.plume.file.gallery.guice.GuiceFileGalleryModuleQuerydsl;
-import com.coreoz.plume.file.gallery.services.galleryType.FileGalleryTypesProvider;
+import com.coreoz.plume.file.gallery.services.gallerytype.FileGalleryTypesProvider;
 import com.coreoz.plume.file.gallery.webservices.permissions.FileGalleryTypesAdminProvider;
 import com.coreoz.plume.file.guice.GuiceFileModuleQuerydsl;
-import com.coreoz.plume.file.services.fileType.FileTypesProvider;
+import com.coreoz.plume.file.services.filetype.FileTypesProvider;
 import com.coreoz.plume.jersey.guice.GuiceJacksonModule;
 import com.google.inject.AbstractModule;
 
