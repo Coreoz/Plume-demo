@@ -18,7 +18,7 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 
-		<plume.version>1.0.0-SNAPSHOT</plume.version>
+		<plume-dependencies.version>1.0.0-rc1</plume-dependencies.version>
 	</properties>
 
 	<build>
@@ -187,22 +187,11 @@
 			<dependency>
 				<groupId>com.coreoz</groupId>
 				<artifactId>plume-dependencies</artifactId>
-				<version>${plume.version}</version>
+				<version>${plume-dependencies.version}</version>
 				<scope>import</scope>
 				<type>pom</type>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
-	<!-- TODO: to delete once a Plume version is used instead of a snapshot -->
-	<repositories>
-		<repository>
-			<id>oss.snapshot</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
 
 </project>
