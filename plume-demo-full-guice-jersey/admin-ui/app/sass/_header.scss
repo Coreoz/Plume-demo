@@ -44,16 +44,6 @@
 
   #aside-nav-toggle {
     display: none;
-    margin-left: 1rem;
-
-    .btn {
-      background: #fff;
-
-      &:hover,
-      &.active {
-        background: $gray-lighter;
-      }
-    }
   }
 
   @include media-breakpoint-down(sm) {
@@ -61,11 +51,22 @@
 
     #aside-nav-toggle {
       @include flexbox;
+      @include flex-basis(12rem);
+      padding-left: 1rem;
+
+      .btn {
+        background: #fff;
+
+        &:hover,
+        &.active {
+          background: $gray-lighter;
+        }
+      }
     }
 
     &>#site-logo {
       @include flex(1, 0, auto);
-      width: auto;
+      @include flex-basis(0);
       background: transparent;
     }
 
@@ -75,6 +76,7 @@
 
     &>#header-nav {
       @include flex(0, 0, auto);
+      @include flex-basis(12rem);
     }
   }
 
