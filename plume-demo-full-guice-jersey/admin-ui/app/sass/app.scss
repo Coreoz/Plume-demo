@@ -5,8 +5,10 @@
 
 @import "../../node_modules/sass-flex-mixin/flex";
 
+@import "root";
 @import "layout";
 @import "header";
 @import "content";
 @import "sidemenu";
 @import "login";
+@import "medias";

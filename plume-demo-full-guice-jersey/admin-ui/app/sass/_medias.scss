@@ -1,0 +1,28 @@
+.media-file {
+  .media-preview {
+    max-width: 14rem;
+    max-height: 14rem;
+  }
+
+  div .media-file-input {
+    display: none;
+  }
+}
+
+.gallery-media {
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 1rem;
+  margin-bottom: 1rem;
+  
+  .media-preview-container {
+    width: 14rem;
+    height: 10rem;
+    
+    .media-preview {
+      max-width: 100%;
+      max-height: 100%;
+    }
+  }
+}
+

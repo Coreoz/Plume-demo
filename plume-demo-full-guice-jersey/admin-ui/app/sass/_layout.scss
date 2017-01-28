@@ -1,7 +1,3 @@
-html {
-  font-size: 14px;
-}
-
 #app {
   margin: 0;
   height: 100vh;
@@ -37,6 +33,7 @@ html {
      
      &>main {
        @include flex-basis(0);
+       width: 0; /* to make sure the main container will never be larger than it should */
      }
     }
 
