@@ -7,7 +7,8 @@ var app = angular.module('admin',[
 	'pascalprecht.translate',
 	'toaster',
 	'ngDialog',
-	'smart-table'
+	'smart-table',
+	'naif.base64'
 ])
 .config(function($compileProvider) {
 	$compileProvider.debugInfoEnabled(false);
