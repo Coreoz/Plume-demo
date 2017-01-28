@@ -1,0 +1,7 @@
+<ul class="nav nav-tabs">
+	<li class="nav-item" ng-repeat="tab in tabs" ng-if="tab.visible">
+		<a class="nav-link" ui-sref="{{tab.state}}" ui-sref-active="active">
+			{{tab.label}}
+		</a>
+	</li>
+</ul>

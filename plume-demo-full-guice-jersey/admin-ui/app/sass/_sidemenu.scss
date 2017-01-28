@@ -1,4 +1,8 @@
 #aside-nav {
+  >.nav {
+    @include flex-direction(column);
+  }
+
   a {
     color: $gray-lighter;
     border-radius: 0;
