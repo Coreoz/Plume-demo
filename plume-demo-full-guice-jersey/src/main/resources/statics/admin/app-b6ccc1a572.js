@@ -16,7 +16,8 @@ var translations_fr = {
 		"nav" : {
 			"USERS" : "Utilisateurs",
 			"ROLES" : "Roles",
-			"HOME" : "Accueil"
+			"HOME" : "Accueil",
+			"CITIES": "Villes"
 		}
 	},
 	"header" : {
@@ -54,6 +55,21 @@ var translations_fr = {
 		"NEW_TITLE" : "Creation d'un rôle",
 		"DELETE_CONFIRM": "Supprimer le rôle ?"
 	},
+	"cities": {
+		"TITLE": "Liste des villes",
+		"CREATE_TITLE": "Création d'une ville",
+		"DETAILS": "Détail de la ville {{name}}",
+		"NAME": "Nom",
+		"IMAGE": "Illustration",
+		"ACTIVE": "Ville active",
+		"MODIFICATION_DATE": "Date de modification",
+		"EMPTY_LIST": "Aucune ville n'a pour le moment été créée. Pour en ajouter une, cliquez sur le bouton 'Nouveau'.",
+		"DELETE_CONFIRM": "Confirmez la suppression de la ville ?",
+		"tab": {
+			"GENERAL_DATA": "Données générales",
+			"GALLERY": "Galerie"
+		}
+	},
 	"actions" : {
 		"BACK" : "Retour",
 		"CANCEL" : "Annuler",
@@ -61,6 +77,9 @@ var translations_fr = {
 		"DELETE" : "Supprimer",
 		"NEW" : "Nouveau",
 		"CONFIRM" : "Confirmer"
+	},
+	"file": {
+		"SELECT": "Sélectionner un fichier..."
 	},
 	"message" : {
 		"SUCCESS" : "Les modifications ont bien été prises en compte",
@@ -87,7 +106,8 @@ var translations_en = {
 		"nav" : {
 			"USERS" : "Users",
 			"ROLES" : "Roles",
-			"HOME" : "Home"
+			"HOME" : "Home",
+			"CITIES": "Cities"
 		}
 	},
 	"header" : {
@@ -132,6 +152,9 @@ var translations_en = {
 		"DELETE" : "Delete",
 		"NEW" : "New",
 		"CONFIRM" : "Confirm"
+	},
+	"file": {
+		"SELECT": "Select a file..."
 	},
 	"message" : {
 		"SUCCESS" : "Changes have been successfully saved",
@@ -33898,7 +33921,7 @@ angular.module('ngResource', ['ng']).
 
 /**
  * State-based routing for AngularJS
- * @version v0.3.2
+ * @version v0.4.2
  * @link http://angular-ui.github.com/
  * @license MIT License, http://www.opensource.org/licenses/MIT
  */
@@ -34301,11 +34324,13 @@ function $Resolve(  $q,    $injector) {
       // To complete the overall resolution, we have to wait for the parent
       // promise and for the promise for each invokable in our plan.
       var resolution = $q.defer(),
-          result = resolution.promise,
+          result = silenceUncaughtInPromise(resolution.promise),
           promises = result.$$promises = {},
           values = extend({}, locals),
           wait = 1 + plan.length/3,
           merged = false;
+
+      silenceUncaughtInPromise(result);
           
       function done() {
         // Merge parent values we haven't got yet and publish our own $$values
@@ -34385,7 +34410,7 @@ function $Resolve(  $q,    $injector) {
           }
         }
         // Publish promise synchronously; invocations further down in the plan may depend on it.
-        promises[key] = invocation.promise;
+        promises[key] = silenceUncaughtInPromise(invocation.promise);
       }
       
       return result;
@@ -34461,6 +34486,57 @@ function $Resolve(  $q,    $injector) {
 angular.module('ui.router.util').service('$resolve', $Resolve);
 
 
+
+/**
+ * @ngdoc object
+ * @name ui.router.util.$templateFactoryProvider
+ *
+ * @description
+ * Provider for $templateFactory. Manages which template-loading mechanism to
+ * use, and will default to the most recent one ($templateRequest on Angular
+ * versions starting from 1.3, $http otherwise).
+ */
+function TemplateFactoryProvider() {
+  var shouldUnsafelyUseHttp = angular.version.minor < 3;
+
+  /**
+   * @ngdoc function
+   * @name ui.router.util.$templateFactoryProvider#shouldUnsafelyUseHttp
+   * @methodOf ui.router.util.$templateFactoryProvider
+   *
+   * @description
+   * Forces $templateFactory to use $http instead of $templateRequest. This
+   * might cause XSS, as $http doesn't enforce the regular security checks for
+   * templates that have been introduced in Angular 1.3. Note that setting this
+   * to false on Angular older than 1.3.x will crash, as the $templateRequest
+   * service (and the security checks) are not implemented on these versions.
+   *
+   * See the $sce documentation, section
+   * <a href="https://docs.angularjs.org/api/ng/service/$sce#impact-on-loading-templates">
+   * Impact on loading templates</a> for more details about this mechanism.
+   *
+   * @param {boolean} value
+   */
+  this.shouldUnsafelyUseHttp = function(value) {
+    shouldUnsafelyUseHttp = !!value;
+  };
+
+  /**
+   * @ngdoc object
+   * @name ui.router.util.$templateFactory
+   *
+   * @requires $http
+   * @requires $templateCache
+   * @requires $injector
+   *
+   * @description
+   * Service. Manages loading of templates.
+   */
+  this.$get = ['$http', '$templateCache', '$injector', function($http, $templateCache, $injector){
+    return new TemplateFactory($http, $templateCache, $injector, shouldUnsafelyUseHttp);}];
+}
+
+
 /**
  * @ngdoc object
  * @name ui.router.util.$templateFactory
@@ -34472,8 +34548,7 @@ angular.module('ui.router.util').service('$resolve', $Resolve);
  * @description
  * Service. Manages loading of templates.
  */
-$TemplateFactory.$inject = ['$http', '$templateCache', '$injector'];
-function $TemplateFactory(  $http,   $templateCache,   $injector) {
+function TemplateFactory($http, $templateCache, $injector, shouldUnsafelyUseHttp) {
 
   /**
    * @ngdoc function
@@ -34545,9 +34620,15 @@ function $TemplateFactory(  $http,   $templateCache,   $injector) {
   this.fromUrl = function (url, params) {
     if (isFunction(url)) url = url(params);
     if (url == null) return null;
-    else return $http
-        .get(url, { cache: $templateCache, headers: { Accept: 'text/html' }})
-        .then(function(response) { return response.data; });
+    else {
+      if(!shouldUnsafelyUseHttp) {
+        return $injector.get('$templateRequest')(url);
+      } else {
+        return $http
+          .get(url, { cache: $templateCache, headers: { Accept: 'text/html' }})
+          .then(function(response) { return response.data; });
+      }
+    }
   };
 
   /**
@@ -34570,7 +34651,7 @@ function $TemplateFactory(  $http,   $templateCache,   $injector) {
   };
 }
 
-angular.module('ui.router.util').service('$templateFactory', $TemplateFactory);
+angular.module('ui.router.util').provider('$templateFactory', TemplateFactoryProvider);
 
 var $$UMFP; // reference to $UrlMatcherFactoryProvider
 
@@ -35184,7 +35265,7 @@ function $UrlMatcherFactory() {
     "int": {
       encode: valToString,
       decode: function(val) { return parseInt(val, 10); },
-      is: function(val) { return isDefined(val) && this.decode(val.toString()) === val; },
+      is: function(val) { return val !== undefined && val !== null && this.decode(val.toString()) === val; },
       pattern: /\d+/
     },
     "bool": {
@@ -37307,6 +37388,7 @@ function $StateProvider(   $urlRouterProvider,   $urlMatcherFactory) {
         return $q.reject(error);
       });
 
+      silenceUncaughtInPromise(transition);
       return transition;
     };
 
@@ -37350,7 +37432,11 @@ function $StateProvider(   $urlRouterProvider,   $urlMatcherFactory) {
 
       if (!isDefined(state)) { return undefined; }
       if ($state.$current !== state) { return false; }
-      return params ? equalForKeys(state.params.$$values(params), $stateParams) : true;
+
+      return !params || objectKeys(params).reduce(function(acc, key) {
+        var paramDef = state.params[key];
+        return acc && !paramDef || paramDef.type.equals($stateParams[key], params[key]);
+      }, true);
     };
 
     /**
@@ -37426,7 +37512,10 @@ function $StateProvider(   $urlRouterProvider,   $urlMatcherFactory) {
         }
       }
 
-      return true;
+      return objectKeys(params).reduce(function(acc, key) {
+        var paramDef = state.params[key];
+        return acc && !paramDef || paramDef.type.equals($stateParams[key], params[key]);
+      }, true);
     };
 
 
@@ -38003,12 +38092,21 @@ function $ViewDirectiveFill (  $compile,   $controller,   $state,   $interpolate
     priority: -400,
     compile: function (tElement) {
       var initial = tElement.html();
+      if (tElement.empty) {
+        tElement.empty();
+      } else {
+        // ng 1.0.0 doesn't have empty(), which cleans up data and handlers
+        tElement[0].innerHTML = null;
+      }
+
       return function (scope, $element, attrs) {
         var current = $state.$current,
             name = getUiViewName(scope, attrs, $element, $interpolate),
             locals  = current && current.locals[name];
 
         if (! locals) {
+          $element.html(initial);
+          $compile($element.contents())(scope);
           return;
         }
 
@@ -38534,6 +38632,13 @@ angular.module('ui.router.state')
 
 /*! ng-dialog - v0.6.3 (https://github.com/likeastore/ngDialog) */
 !function(a,b){"undefined"!=typeof module&&module.exports?(b("undefined"==typeof angular?require("angular"):angular),module.exports="ngDialog"):"function"==typeof define&&define.amd?define(["angular"],b):b(a.angular)}(this,function(a){"use strict";var b=a.module("ngDialog",[]),c=a.element,d=a.isDefined,e=(document.body||document.documentElement).style,f=d(e.animation)||d(e.WebkitAnimation)||d(e.MozAnimation)||d(e.MsAnimation)||d(e.OAnimation),g="animationend webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend",h="a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, *[tabindex], *[contenteditable]",i="ngdialog-disabled-animation",j={html:!1,body:!1},k={},l=[],m=!1,n=!1;return b.provider("ngDialog",function(){var b=this.defaults={className:"ngdialog-theme-default",appendClassName:"",disableAnimation:!1,plain:!1,showClose:!0,closeByDocument:!0,closeByEscape:!0,closeByNavigation:!1,appendTo:!1,preCloseCallback:!1,overlay:!0,cache:!0,trapFocus:!0,preserveFocus:!0,ariaAuto:!0,ariaRole:null,ariaLabelledById:null,ariaLabelledBySelector:null,ariaDescribedById:null,ariaDescribedBySelector:null,bodyClassName:"ngdialog-open",width:null,height:null};this.setForceHtmlReload=function(a){j.html=a||!1},this.setForceBodyReload=function(a){j.body=a||!1},this.setDefaults=function(c){a.extend(b,c)},this.setOpenOnePerName=function(a){n=a||!1};var d,e=0,o=0,p={};this.$get=["$document","$templateCache","$compile","$q","$http","$rootScope","$timeout","$window","$controller","$injector",function(q,r,s,t,u,v,w,x,y,z){var A=[],B={onDocumentKeydown:function(a){27===a.keyCode&&C.close("$escape")},activate:function(a){var b=a.data("$ngDialogOptions");b.trapFocus&&(a.on("keydown",B.onTrapFocusKeydown),A.body.on("keydown",B.onTrapFocusKeydown))},deactivate:function(a){a.off("keydown",B.onTrapFocusKeydown),A.body.off("keydown",B.onTrapFocusKeydown)},deactivateAll:function(b){a.forEach(b,function(b){var c=a.element(b);B.deactivate(c)})},setBodyPadding:function(a){var b=parseInt(A.body.css("padding-right")||0,10);A.body.css("padding-right",b+a+"px"),A.body.data("ng-dialog-original-padding",b),v.$broadcast("ngDialog.setPadding",a)},resetBodyPadding:function(){var a=A.body.data("ng-dialog-original-padding");a?A.body.css("padding-right",a+"px"):A.body.css("padding-right",""),v.$broadcast("ngDialog.setPadding",0)},performCloseDialog:function(a,b){var c=a.data("$ngDialogOptions"),e=a.attr("id"),h=k[e];if(h){if("undefined"!=typeof x.Hammer){var i=h.hammerTime;i.off("tap",d),i.destroy&&i.destroy(),delete h.hammerTime}else a.unbind("click");1===o&&A.body.unbind("keydown",B.onDocumentKeydown),a.hasClass("ngdialog-closing")||(o-=1);var j=a.data("$ngDialogPreviousFocus");j&&j.focus&&j.focus(),v.$broadcast("ngDialog.closing",a,b),o=o<0?0:o,f&&!c.disableAnimation?(h.$destroy(),a.unbind(g).bind(g,function(){B.closeDialogElement(a,b)}).addClass("ngdialog-closing")):(h.$destroy(),B.closeDialogElement(a,b)),p[e]&&(p[e].resolve({id:e,value:b,$dialog:a,remainingDialogs:o}),delete p[e]),k[e]&&delete k[e],l.splice(l.indexOf(e),1),l.length||(A.body.unbind("keydown",B.onDocumentKeydown),m=!1)}},closeDialogElement:function(a,b){var c=a.data("$ngDialogOptions");a.remove(),0===o&&(A.html.removeClass(c.bodyClassName),A.body.removeClass(c.bodyClassName),B.resetBodyPadding()),v.$broadcast("ngDialog.closed",a,b)},closeDialog:function(b,c){var d=b.data("$ngDialogPreCloseCallback");if(d&&a.isFunction(d)){var e=d.call(b,c);if(a.isObject(e))e.closePromise?e.closePromise.then(function(){B.performCloseDialog(b,c)},function(){return!1}):e.then(function(){B.performCloseDialog(b,c)},function(){return!1});else{if(e===!1)return!1;B.performCloseDialog(b,c)}}else B.performCloseDialog(b,c)},onTrapFocusKeydown:function(b){var c,d=a.element(b.currentTarget);if(d.hasClass("ngdialog"))c=d;else if(c=B.getActiveDialog(),null===c)return;var e=9===b.keyCode,f=b.shiftKey===!0;e&&B.handleTab(c,b,f)},handleTab:function(a,b,c){var d=B.getFocusableElements(a);if(0===d.length)return void(document.activeElement&&document.activeElement.blur&&document.activeElement.blur());var e=document.activeElement,f=Array.prototype.indexOf.call(d,e),g=f===-1,h=0===f,i=f===d.length-1,j=!1;c?(g||h)&&(d[d.length-1].focus(),j=!0):(g||i)&&(d[0].focus(),j=!0),j&&(b.preventDefault(),b.stopPropagation())},autoFocus:function(a){var b=a[0],d=b.querySelector("*[autofocus]");if(null===d||(d.focus(),document.activeElement!==d)){var e=B.getFocusableElements(a);if(e.length>0)return void e[0].focus();var f=B.filterVisibleElements(b.querySelectorAll("h1,h2,h3,h4,h5,h6,p,span"));if(f.length>0){var g=f[0];c(g).attr("tabindex","-1").css("outline","0"),g.focus()}}},getFocusableElements:function(a){var b=a[0],c=b.querySelectorAll(h),d=B.filterTabbableElements(c);return B.filterVisibleElements(d)},filterTabbableElements:function(a){for(var b=[],d=0;d<a.length;d++){var e=a[d];"-1"!==c(e).attr("tabindex")&&b.push(e)}return b},filterVisibleElements:function(a){for(var b=[],c=0;c<a.length;c++){var d=a[c];(d.offsetWidth>0||d.offsetHeight>0)&&b.push(d)}return b},getActiveDialog:function(){var a=document.querySelectorAll(".ngdialog");return 0===a.length?null:c(a[a.length-1])},applyAriaAttributes:function(a,b){if(b.ariaAuto){if(!b.ariaRole){var c=B.getFocusableElements(a).length>0?"dialog":"alertdialog";b.ariaRole=c}b.ariaLabelledBySelector||(b.ariaLabelledBySelector="h1,h2,h3,h4,h5,h6"),b.ariaDescribedBySelector||(b.ariaDescribedBySelector="article,section,p")}b.ariaRole&&a.attr("role",b.ariaRole),B.applyAriaAttribute(a,"aria-labelledby",b.ariaLabelledById,b.ariaLabelledBySelector),B.applyAriaAttribute(a,"aria-describedby",b.ariaDescribedById,b.ariaDescribedBySelector)},applyAriaAttribute:function(a,b,d,e){if(d&&a.attr(b,d),e){var f=a.attr("id"),g=a[0].querySelector(e);if(!g)return;var h=f+"-"+b;return c(g).attr("id",h),a.attr(b,h),h}},detectUIRouter:function(){try{return a.module("ui.router"),!0}catch(b){return!1}},getRouterLocationEventName:function(){return B.detectUIRouter()?"$stateChangeStart":"$locationChangeStart"}},C={__PRIVATE__:B,open:function(f){function g(a,b){return v.$broadcast("ngDialog.templateLoading",a),u.get(a,b||{}).then(function(b){return v.$broadcast("ngDialog.templateLoaded",a),b.data||""})}function h(b){return b?a.isString(b)&&q.plain?b:"boolean"!=typeof q.cache||q.cache?g(b,{cache:r}):g(b,{cache:!1}):"Empty template"}var j=null;if(f=f||{},!(n&&f.name&&(j=f.name.toLowerCase().replace(/\s/g,"-")+"-dialog",this.isOpen(j)))){var q=a.copy(b),D=++e;j=j||"ngdialog"+D,l.push(j),"undefined"!=typeof q.data&&("undefined"==typeof f.data&&(f.data={}),f.data=a.merge(a.copy(q.data),f.data)),a.extend(q,f);var E;p[j]=E=t.defer();var F;k[j]=F=a.isObject(q.scope)?q.scope.$new():v.$new();var G,H,I,J=a.extend({},q.resolve);return a.forEach(J,function(b,c){J[c]=a.isString(b)?z.get(b):z.invoke(b,null,null,c)}),t.all({template:h(q.template||q.templateUrl),locals:t.all(J)}).then(function(b){var e=b.template,f=b.locals;q.showClose&&(e+='<div class="ngdialog-close"></div>');var g=q.overlay?"":" ngdialog-no-overlay";if(G=c('<div id="'+j+'" class="ngdialog'+g+'"></div>'),G.html(q.overlay?'<div class="ngdialog-overlay"></div><div class="ngdialog-content" role="document">'+e+"</div>":'<div class="ngdialog-content" role="document">'+e+"</div>"),G.data("$ngDialogOptions",q),F.ngDialogId=j,q.data&&a.isString(q.data)){var h=q.data.replace(/^\s*/,"")[0];F.ngDialogData="{"===h||"["===h?a.fromJson(q.data):new String(q.data),F.ngDialogData.ngDialogId=j}else q.data&&a.isObject(q.data)&&(F.ngDialogData=q.data,F.ngDialogData.ngDialogId=j);if(q.className&&G.addClass(q.className),q.appendClassName&&G.addClass(q.appendClassName),q.width&&(I=G[0].querySelector(".ngdialog-content"),a.isString(q.width)?I.style.width=q.width:I.style.width=q.width+"px"),q.height&&(I=G[0].querySelector(".ngdialog-content"),a.isString(q.height)?I.style.height=q.height:I.style.height=q.height+"px"),q.disableAnimation&&G.addClass(i),H=q.appendTo&&a.isString(q.appendTo)?a.element(document.querySelector(q.appendTo)):A.body,B.applyAriaAttributes(G,q),q.preCloseCallback){var k;a.isFunction(q.preCloseCallback)?k=q.preCloseCallback:a.isString(q.preCloseCallback)&&F&&(a.isFunction(F[q.preCloseCallback])?k=F[q.preCloseCallback]:F.$parent&&a.isFunction(F.$parent[q.preCloseCallback])?k=F.$parent[q.preCloseCallback]:v&&a.isFunction(v[q.preCloseCallback])&&(k=v[q.preCloseCallback])),k&&G.data("$ngDialogPreCloseCallback",k)}if(F.closeThisDialog=function(a){B.closeDialog(G,a)},q.controller&&(a.isString(q.controller)||a.isArray(q.controller)||a.isFunction(q.controller))){var l;q.controllerAs&&a.isString(q.controllerAs)&&(l=q.controllerAs);var n=y(q.controller,a.extend(f,{$scope:F,$element:G}),!0,l);q.bindToController&&a.extend(n.instance,{ngDialogId:F.ngDialogId,ngDialogData:F.ngDialogData,closeThisDialog:F.closeThisDialog,confirm:F.confirm}),"function"==typeof n?G.data("$ngDialogControllerController",n()):G.data("$ngDialogControllerController",n)}if(w(function(){var a=document.querySelectorAll(".ngdialog");B.deactivateAll(a),s(G)(F);var b=x.innerWidth-A.body.prop("clientWidth");A.html.addClass(q.bodyClassName),A.body.addClass(q.bodyClassName);var c=b-(x.innerWidth-A.body.prop("clientWidth"));c>0&&B.setBodyPadding(c),H.append(G),B.activate(G),q.trapFocus&&B.autoFocus(G),q.name?v.$broadcast("ngDialog.opened",{dialog:G,name:q.name}):v.$broadcast("ngDialog.opened",G)}),m||(A.body.bind("keydown",B.onDocumentKeydown),m=!0),q.closeByNavigation){var p=B.getRouterLocationEventName();v.$on(p,function(a){B.closeDialog(G)===!1&&a.preventDefault()})}if(q.preserveFocus&&G.data("$ngDialogPreviousFocus",document.activeElement),d=function(a){var b=!!q.closeByDocument&&c(a.target).hasClass("ngdialog-overlay"),d=c(a.target).hasClass("ngdialog-close");(b||d)&&C.close(G.attr("id"),d?"$closeButton":"$document")},"undefined"!=typeof x.Hammer){var r=F.hammerTime=x.Hammer(G[0]);r.on("tap",d)}else G.bind("click",d);return o+=1,C}),{id:j,closePromise:E.promise,close:function(a){B.closeDialog(G,a)}}}},openConfirm:function(d){var e=t.defer(),f=a.copy(b);d=d||{},"undefined"!=typeof f.data&&("undefined"==typeof d.data&&(d.data={}),d.data=a.merge(a.copy(f.data),d.data)),a.extend(f,d),f.scope=a.isObject(f.scope)?f.scope.$new():v.$new(),f.scope.confirm=function(a){e.resolve(a);var b=c(document.getElementById(g.id));B.performCloseDialog(b,a)};var g=C.open(f);if(g)return g.closePromise.then(function(a){return a?e.reject(a.value):e.reject()}),e.promise},isOpen:function(a){var b=c(document.getElementById(a));return b.length>0},close:function(a,b){var d=c(document.getElementById(a));if(d.length)B.closeDialog(d,b);else if("$escape"===a){var e=l[l.length-1];d=c(document.getElementById(e)),d.data("$ngDialogOptions").closeByEscape&&B.closeDialog(d,"$escape")}else C.closeAll(b);return C},closeAll:function(a){for(var b=document.querySelectorAll(".ngdialog"),d=b.length-1;d>=0;d--){var e=b[d];B.closeDialog(c(e),a)}},getOpenDialogs:function(){return l},getDefaults:function(){return b}};return a.forEach(["html","body"],function(a){if(A[a]=q.find(a),j[a]){var b=B.getRouterLocationEventName();v.$on(b,function(){A[a]=q.find(a)})}}),C}]}),b.directive("ngDialog",["ngDialog",function(b){return{restrict:"A",scope:{ngDialogScope:"="},link:function(c,d,e){d.on("click",function(d){d.preventDefault();var f=a.isDefined(c.ngDialogScope)?c.ngDialogScope:"noScope";a.isDefined(e.ngDialogClosePrevious)&&b.close(e.ngDialogClosePrevious);var g=b.getDefaults();b.open({template:e.ngDialog,className:e.ngDialogClass||g.className,appendClassName:e.ngDialogAppendClass,controller:e.ngDialogController,controllerAs:e.ngDialogControllerAs,bindToController:e.ngDialogBindToController,scope:f,data:e.ngDialogData,showClose:"false"!==e.ngDialogShowClose&&("true"===e.ngDialogShowClose||g.showClose),closeByDocument:"false"!==e.ngDialogCloseByDocument&&("true"===e.ngDialogCloseByDocument||g.closeByDocument),closeByEscape:"false"!==e.ngDialogCloseByEscape&&("true"===e.ngDialogCloseByEscape||g.closeByEscape),overlay:"false"!==e.ngDialogOverlay&&("true"===e.ngDialogOverlay||g.overlay),preCloseCallback:e.ngDialogPreCloseCallback||g.preCloseCallback,bodyClassName:e.ngDialogBodyClass||g.bodyClassName})})}}}]),b});
+/*! angular-base64-upload - v0.1.19
+* https://github.com/adonespitogo/angular-base64-upload
+* Copyright (c) Adones Pitogo <pitogo.adones@gmail.com> [March 13, 2016]
+* Licensed MIT */
+
+!function(a,b){"use strict";a._arrayBufferToBase64=function(b){for(var c="",d=new Uint8Array(b),e=d.byteLength,f=0;e>f;f++)c+=String.fromCharCode(d[f]);return a.btoa(c)};var c=a.angular.module("naif.base64",[]);c.directive("baseSixtyFourInput",["$window","$q",function(a,b){for(var c={onChange:"&",onAfterValidate:"&",parser:"&"},d=["onabort","onerror","onloadstart","onloadend","onprogress","onload"],e=d.length-1;e>=0;e--){var f=d[e];c[f]="&"}return{restrict:"A",require:"ngModel",scope:c,link:function(c,e,f,g){function h(){for(var c=t.length-1;c>=0;c--){var d=new a.FileReader,e=t[c],f={},g=[];f.filetype=e.type,f.filename=e.name,f.filesize=e.size,t[c].deferredObj=b.defer(),g.push(t[c].deferredObj.promise),b.all(g).then(n),k(d,e,f),d.readAsArrayBuffer(e)}}function i(a){f.onChange&&c.onChange()(a,t)}function j(a){if(f.onAfterValidate){for(var d=[],e=t.length-1;e>=0;e--)d.push(t[e].deferredObj.promise);b.all(d).then(function(){c.onAfterValidate()(a,u,t)})}}function k(a,b,e){for(var g=d.length-1;g>=0;g--){var h=d[g];f[h]&&"onload"!==h&&l(h,c[h],a,b,e)}a.onload=m(a,b,e)}function l(a,b,c,d,e){c[a]=function(a){b()(a,c,d,t,u,e)}}function m(d,e,g){return function(h){var i,j=h.target.result;g.base64=a._arrayBufferToBase64(j),i=f.parser?b.when(c.parser()(e,g)):b.when(g),i.then(function(a){u.push(a),e.deferredObj.resolve()}),f.onload&&c.onload()(h,d,e,t,u,g)}}function n(){var a=f.multiple?u:u[0];g.$setViewValue(a),q(a),r(a),o(a),p(a),s(a)}function o(a){if(f.maxnum&&f.multiple&&a){var b=a.length<=parseInt(f.maxnum);g.$setValidity("maxnum",b)}return a}function p(a){if(f.minnum&&f.multiple&&a){var b=a.length>=parseInt(f.minnum);g.$setValidity("minnum",b)}return a}function q(a){var b=!0;if(f.maxsize&&a){var c=1e3*parseFloat(f.maxsize);if(f.multiple)for(var d=0;d<a.length;d++){var e=a[d];if(e.filesize>c){b=!1;break}}else b=a.filesize<=c;g.$setValidity("maxsize",b)}return a}function r(a){var b=!0,c=1e3*parseFloat(f.minsize);if(f.minsize&&a){if(f.multiple)for(var d=0;d<a.length;d++){var e=a[d];if(e.filesize<c){b=!1;break}}else b=a.filesize>=c;g.$setValidity("minsize",b)}return a}function s(a){var b,c,d,e=!0;if(f.accept&&(c=f.accept.trim().replace(/[,\s]+/gi,"|").replace(/\./g,"\\.").replace(/\/\*/g,"/.*"),b=new RegExp(c)),f.accept&&a){if(f.multiple)for(var h=0;h<a.length;h++){var i=a[h];if(d="."+i.filename.split(".").pop(),e=b.test(i.filetype)||b.test(d),!e)break}else d="."+a.filename.split(".").pop(),e=b.test(a.filetype)||b.test(d);g.$setValidity("accept",e)}return a}if(g){var t=[],u=[];e.on("change",function(a){a.target.files.length&&(u=[],u=angular.copy(u),t=a.target.files,h(),i(a),j(a))}),g.$isEmpty=function(a){return!a||(angular.isArray(a)?0===a.length:!a.base64)},c._clearInput=function(){e[0].value=""},c.$watch(function(){return g.$viewValue},function(a,b){g.$isEmpty(b)||g.$isEmpty(a)&&c._clearInput()})}}}}])}(window);
+//# sourceMappingURL=angular-base64-upload.min.js.map
 'use strict';
 
 var app = angular.module('admin',[
@@ -38543,7 +38648,8 @@ var app = angular.module('admin',[
 	'pascalprecht.translate',
 	'toaster',
 	'ngDialog',
-	'smart-table'
+	'smart-table',
+	'naif.base64'
 ])
 .config(function($compileProvider) {
 	$compileProvider.debugInfoEnabled(false);
@@ -38637,6 +38743,35 @@ app.config(function($stateProvider, $urlRouterProvider) {
 			url: '/roles',
 			templateUrl: 'app/pages/roles/roles.html'
 		})
+
+		// cities
+		.state('app.cities', {
+			abstract : true,
+			url : '/cities',
+			template : '<div ui-view></div>'
+		})
+		.state('app.cities.list', {
+			url : '/',
+			templateUrl : 'app/pages/cities/city-list.html'
+		})
+		.state('app.cities.tabs', {
+			abstract : true,
+			url : '/:cityId',
+			templateUrl : 'app/pages/cities/city-tabs.html'
+		})
+		.state('app.cities.tabs.generaldata', {
+			url : '/info',
+			templateUrl : 'app/pages/cities/city-tab-general-data.html'
+		})
+		.state('app.cities.tabs.gallery', {
+			url : '/gallery',
+			templateUrl : 'app/pages/cities/city-tab-gallery.html'
+		})
+		.state('app.cities.create', {
+			url : '/new',
+			templateUrl : 'app/pages/cities/city-create.html'
+		})
+		
 		
 		;
 });
@@ -38751,6 +38886,39 @@ app
 		}
 	};
 });
+
+'use strict';
+
+/**
+ * tabs format :
+ * [
+ * 		{
+ * 			label: "Tab name",
+ * 			state: "app.users.info",
+ * 			visible: $rootScope.hasPermission("SITE_EDIT_GENERAL")
+ * 		}
+ * ]
+ * 
+ * while "label" and "state" parameters are mandatory, "visible" parameter is optional and is true by default
+ */
+app
+.directive('plumeTabs', function() {
+	return {
+		restrict: 'E',
+		scope: {
+			tabs: '=tabs'
+		},
+		templateUrl: 'app/directives/tabs/plm-tabs.html',
+		controller: function($scope) {
+			$scope.tabs.forEach(function(tab) {
+				if(typeof tab.visible === 'undefined') {
+					tab.visible = true;
+				}
+			});
+		}
+	};
+});
+
 
 'use strict';
 
@@ -39317,6 +39485,162 @@ app
 
 });
 
+'use strict';
+
+app.service('citiesService', function ($resource, $q) {
+	
+	var resource = $resource('/api/admin/city/:id', null, {
+		'list': { method: 'GET', isArray: true},
+		'save': { method: 'POST'},
+		'delete': { method:'DELETE'}
+	});
+	
+	var cities = null;
+	
+	var fetchCities = function() {
+		return resource
+			.list()
+			.$promise
+			.then(function(result) {
+				cities = result;
+				return cities;
+			});
+	};
+	
+	var currentCities = function() {
+		if(cities != null) {
+			return $q.resolve(cities);
+		}
+		
+		return fetchCities();
+	};
+	
+	return {
+		'list': function() {
+			return fetchCities();
+		},
+		'save': function(cityToSave) {
+			return resource.save(cityToSave)
+				.$promise
+				.then(function(citySaved) {
+					if(cityToSave.create && cities != null) {
+						cities.push(citySaved);
+					}
+					
+					return citySaved;
+				});
+		},
+		'get': function(cityId) {
+			return currentCities()
+				.then(function(cities) {
+					return cities.find(function(city) {
+						return city.data.id == cityId;
+					})
+				});
+		},
+		'delete': function(id) {
+			return resource.delete({id: id}).$promise;
+		}
+	}
+
+});
+
+'use strict';
+
+app.controller('citiesListController', function(uiService, citiesService, $state) {
+	
+	var that = this;
+	
+	this.cities = [];
+	
+	uiService
+		.withPromise(citiesService.list())
+		.then(function(response) {
+			that.cities = response;
+		})
+		.catch(angular.noop);
+
+	this.displayCity = function(id) {
+		$state.go('app.cities.tabs.generaldata', {cityId: id});
+	}
+
+});
+
+app.controller('citiesTabsController', function($stateParams, uiService, citiesService, $rootScope, $translate) {
+	
+	var that = this;
+	
+	this.title = null;
+	
+	uiService
+		.withPromise(citiesService.get($stateParams.cityId))
+		.then(function(city) {
+			that.title = $translate.instant('cities.DETAILS', {name :city.data.name});
+		})
+		.catch(angular.noop);
+	
+	this.tabs = [
+		{
+			label: $translate.instant('cities.tab.GENERAL_DATA'),
+			state: "app.cities.tabs.generaldata",
+			visible: $rootScope.hasPermission("CITIES_ALTER")
+		},
+		{
+			label: $translate.instant('cities.tab.GALLERY'),
+			state: "app.cities.tabs.gallery",
+			visible: $rootScope.hasPermission("CITIES_GALLERY")
+		}
+	];
+	
+});
+
+app.controller('citiesGeneralDataController', function($stateParams, $state, uiService, citiesService, $translate) {
+	
+	var that = this;
+	
+	this.city = {};
+	this.title = null;
+	
+	if($stateParams.cityId) {
+		uiService
+			.withPromise(citiesService.get($stateParams.cityId))
+			.then(function(city) {
+				that.city = city;
+			})
+			.catch(angular.noop);
+	} else {
+		this.city.create = true;
+	}
+
+	this.save = function(city) {
+		uiService
+			.withPromise(citiesService.save(city), true)
+			.then(function(citySaved) {
+				if(that.city.create) {
+					$state.go('app.cities.tabs.generaldata', {cityId: citySaved.data.id});
+				} else {
+					that.city = citySaved;
+				}
+			})
+			.catch(angular.noop);
+	};
+	
+	this.remove = function(city) {
+		uiService
+			.withConfirmation($translate.instant('cities.DELETE_CONFIRM'))
+			.then(function() {
+				uiService
+					.withPromise(citiesService.delete(city.data.id), true)
+					.then(function() {
+						$state.go('app.cities.list');
+					})
+					.catch(angular.noop);
+			})
+			.catch(angular.noop);
+	};
+
+});
+
 (function(module) {
 try {
   module = angular.module('admin');
@@ -39325,7 +39649,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('app/layout/aside-nav.html',
-    '<ul class="nav nav-pills nav-stacked" ng-controller="sideMenuDropdownController"><li class="nav-item"><a ui-sref-active="active" ui-sref="app.home" class="nav-link"><i class="fa fa-home icon"></i> {{ \'aside.nav.HOME\' | translate }}</a></li><li class="nav-item dropdown" ng-show="hasPermission(\'MANAGE_USERS\') || hasPermission(\'MANAGE_ROLES\')"><a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"><i class="fa fa-users icon"></i> {{ \'aside.nav.USERS\' | translate }}</a><div class="dropdown-menu"><a class="dropdown-item" ui-sref-active="active" ui-sref="app.users.list" ng-show="hasPermission(\'MANAGE_USERS\')">{{ \'aside.nav.USERS\' | translate }} </a><a class="dropdown-item" ui-sref-active="active" ui-sref="app.roles" ng-show="hasPermission(\'MANAGE_ROLES\')">{{ \'aside.nav.ROLES\' | translate }}</a></div></li></ul>');
+    '<ul class="nav nav-pills nav-stacked" ng-controller="sideMenuDropdownController"> <li class="nav-item"> <a ui-sref-active="active" ui-sref="app.home" class="nav-link"> <i class="fa fa-home icon"></i> {{ \'aside.nav.HOME\' | translate }} </a> </li> <li class="nav-item dropdown" ng-show="hasPermission(\'MANAGE_USERS\') || hasPermission(\'MANAGE_ROLES\')"> <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"> <i class="fa fa-users icon"></i> {{ \'aside.nav.USERS\' | translate }} </a> <div class="dropdown-menu"> <a class="dropdown-item" ui-sref-active="active" ui-sref="app.users.list" ng-show="hasPermission(\'MANAGE_USERS\')"> {{ \'aside.nav.USERS\' | translate }} </a> <a class="dropdown-item" ui-sref-active="active" ui-sref="app.roles" ng-show="hasPermission(\'MANAGE_ROLES\')"> {{ \'aside.nav.ROLES\' | translate }} </a> </div> </li> <li class="nav-item"> <a ui-sref-active="active" ui-sref="app.cities.list" class="nav-link"> <i class="fa fa-globe icon"></i> {{ \'aside.nav.CITIES\' | translate }} </a> </li> </ul> ');
 }]);
 })();
 
@@ -39337,7 +39661,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('app/layout/confirm.html',
-    '<div class="dialog-contents panel panel-default"><div class="panel-body"><p>{{message}}</p></div><div class="panel-footer"><button class="btn btn-danger" ng-click="closeThisDialog()">{{ \'actions.CANCEL\' | translate }}</button> <button class="btn btn-success" ng-click="confirm()">{{ \'actions.CONFIRM\' | translate }}</button></div></div>');
+    '<div class="dialog-contents panel panel-default"> <div class="panel-body"> <p>{{message}}</p> </div> <div class="panel-footer"> <button class="btn btn-danger" ng-click="closeThisDialog()">{{ \'actions.CANCEL\' | translate }}</button> <button class="btn btn-success" ng-click="confirm()">{{ \'actions.CONFIRM\' | translate }}</button> </div> </div> ');
 }]);
 })();
 
@@ -39349,7 +39673,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('app/layout/main.html',
-    '<div class="admin-container"><header><div id="aside-nav-toggle" ng-controller="sideMenuController as ctrl"><button type="button" class="btn" ng-click="ctrl.toggle()" ng-class="{\'active\': showAsideNav}"><i class="fa fa-bars" aria-hidden="true"></i></button></div><div id="site-logo"><img src="img/app-logo.png"> <span class="site-name">Coreoz</span></div><div id="header-nav"><ul class="nav nav-pills" ng-controller="userMenuController as ctrl"><li class="nav-item dropdown"><a href class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"><span>{{ctrl.userFullname}}</span> <b class="caret"></b></a><div class="dropdown-menu dropdown-menu-right"><a class="dropdown-item" ui-sref="access.login">{{\'header.LOGOUT\'|translate}}</a></div></li></ul></div></header><div class="admin-content-container"><nav id="aside-nav" ng-class="{\'aside-nav-active\': showAsideNav}" ng-include="\'app/layout/aside-nav.html\'"></nav><main id="main-content" ng-click="ctrl.reset()" ng-controller="sideMenuController as ctrl" ui-view></main></div><toaster-container></toaster-container></div>');
+    '<div class="admin-container"> <header> <div id="aside-nav-toggle" ng-controller="sideMenuController as ctrl"> <button type="button" class="btn" ng-click="ctrl.toggle()" ng-class="{\'active\': showAsideNav}"> <i class="fa fa-bars" aria-hidden="true"></i> </button> </div> <div id="site-logo"> <img src="img/app-logo.png"/> <span class="site-name">Coreoz</span> </div> <div id="header-nav"> <ul class="nav nav-pills" ng-controller="userMenuController as ctrl"> <li class="nav-item dropdown"> <a href class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"> <span>{{ctrl.userFullname}}</span> <b class="caret"></b> </a> <div class="dropdown-menu dropdown-menu-right"> <a class="dropdown-item" ui-sref="access.login"> {{\'header.LOGOUT\'|translate}} </a> </div> </li> </ul> </div> </header> <div class="admin-content-container"> <nav id="aside-nav" ng-class="{\'aside-nav-active\': showAsideNav}" ng-include="\'app/layout/aside-nav.html\'"> </nav> <main id="main-content" ng-click="ctrl.reset()" ng-controller="sideMenuController as ctrl" ui-view></main> </div> <toaster-container></toaster-container> </div> ');
 }]);
 })();
 
@@ -39361,7 +39685,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('app/directives/media/plm-media.html',
-    '<div><div class="btn-group"><a class="btn btn-icon btn-success" target="_blank" ng-href="{{currentMediaUrl}}" ng-show="currentMediaUrl"><i class="fa fa-download" aria-hidden="true"></i></a><label class="btn btn-primary">Select a file... <input class="media-file-input" accept="{{accept}}" type="file" ng-model="mediaModel" base-sixty-four-input></label></div><div ng-show="filename">{{ filename }}</div><div ng-show="isImage && previewHref"><img class="media-preview" ng-src="{{previewHref}}"></div></div>');
+    '<div class="media-file"> <div class="btn-group"> <a class="btn btn-icon btn-success" target="_blank" ng-href="{{currentMediaUrl}}" ng-if="currentMediaUrl"> <i class="fa fa-download" aria-hidden="true"></i> </a> <label class="btn btn-primary"> {{ \'file.SELECT\' | translate }} <input class="media-file-input" accept="{{accept}}" type="file" ng-model="mediaModel" base-sixty-four-input> </label> </div> <div ng-show="filename"> {{ filename }} </div> <div ng-show="isImage && previewHref"> <img class="media-preview" ng-src="{{previewHref}}"/> </div> </div> ');
 }]);
 })();
 
@@ -39373,7 +39697,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('app/directives/panel/plm-form-item.html',
-    '<div class="form-group row"><label class="col-sm-3 control-label">{{label}}</label><div class="col-sm-9"><ng-transclude></ng-transclude></div></div>');
+    '<div class="form-group row"> <label class="col-sm-3 control-label">{{label}}</label> <div class="col-sm-9"> <ng-transclude></ng-transclude> </div> </div> ');
 }]);
 })();
 
@@ -39385,7 +39709,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('app/directives/panel/plm-panel-body.html',
-    '<div class="panel-body"><ng-transclude></ng-transclude></div>');
+    '<div class="panel-body"> <ng-transclude></ng-transclude> </div> ');
 }]);
 })();
 
@@ -39397,7 +39721,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('app/directives/panel/plm-panel-footer.html',
-    '<div class="panel-footer"><ng-transclude></ng-transclude></div>');
+    '<div class="panel-footer"> <ng-transclude></ng-transclude> </div> ');
 }]);
 })();
 
@@ -39409,7 +39733,79 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('app/directives/panel/plm-panel.html',
-    '<div class="panel panel-default"><div class="panel-header"><span class="panel-title">{{title}}</span></div><ng-transclude></ng-transclude></div>');
+    '<div class="panel panel-default"> <div class="panel-header" ng-if="title"> <span class="panel-title">{{title}}</span> </div> <ng-transclude></ng-transclude> </div> ');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('admin');
+} catch (e) {
+  module = angular.module('admin', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('app/directives/tabs/plm-tabs.html',
+    '<ul class="nav nav-tabs"> <li class="nav-item" ng-repeat="tab in tabs" ng-if="tab.visible"> <a class="nav-link" ui-sref="{{tab.state}}" ui-sref-active="active"> {{tab.label}} </a> </li> </ul> ');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('admin');
+} catch (e) {
+  module = angular.module('admin', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('app/pages/cities/city-create.html',
+    '<div> <h1 class="content-title">{{ \'cities.CREATE_TITLE\' | translate }}</h1> <div class="content"> <div ng-include="\'app/pages/cities/city-tab-general-data.html\'"></div> </div> </div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('admin');
+} catch (e) {
+  module = angular.module('admin', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('app/pages/cities/city-list.html',
+    '<div ng-controller="citiesListController as ctrl"> <h1 class="content-title">{{ \'cities.TITLE\' | translate }}</h1> <div class="content"> <plm-panel> <plm-panel-body class="cards-group"> <a ng-repeat="city in ctrl.cities" ng-click="ctrl.displayCity(city.data.id)"> <div class="card" ng-class="{\'inactive\': !city.data.active}"> <div class="thumbnail-container"> <img class="card-img-top" ng-src="{{city.cityImageUrl}}" alt="City image"> </div> <div class="card-block"> <p class="card-text">{{city.data.name}}</p><p> </p></div> </div> </a> <p class="text-center" ng-if="ctrl.cities.length == 0"> {{ \'cities.EMPTY_LIST\' | translate }} </p> </plm-panel-body> <plm-panel-footer> <a ui-sref="app.cities.create" ng-if="hasPermission(\'CITIES_ALTER\')" class="btn btn-primary"> {{ \'actions.NEW\' | translate }} </a> </plm-panel-footer> </plm-panel> </div> </div> ');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('admin');
+} catch (e) {
+  module = angular.module('admin', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('app/pages/cities/city-tab-gallery.html',
+    '<plm-panel> <plm-panel-body> Body gallery </plm-panel-body> <plm-panel-footer> Actions </plm-panel-footer> </plm-panel> ');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('admin');
+} catch (e) {
+  module = angular.module('admin', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('app/pages/cities/city-tab-general-data.html',
+    '<div ng-controller="citiesGeneralDataController as ctrl"> <plm-panel> <form class="form-horizontal" ng-submit="ctrl.save(ctrl.city)"> <plm-panel-body> <plm-form-item label="{{ \'cities.NAME\' | translate }}"> <input class="form-control" ng-model="ctrl.city.data.name"> </plm-form-item> <plm-form-item label="{{ \'cities.IMAGE\' | translate }}"> <plume-media current-media-url="ctrl.city.cityImageUrl" accept="image/*" model="ctrl.city.cityImage"/> </plm-form-item> <plm-form-item label="{{ \'cities.ACTIVE\' | translate }}"> <input type="checkbox" class="form-control" ng-model="ctrl.city.data.active"> </plm-form-item> <hr ng-hide="ctrl.city.create"/> <plm-form-item label="{{ \'cities.MODIFICATION_DATE\' | translate }}" ng-hide="ctrl.city.create"> <p class="form-control-static">{{ctrl.city.data.lastModified | date:"yyyy/MM/dd - HH:mm"}}</p> </plm-form-item> </plm-panel-body> <plm-panel-footer> <a ui-sref="app.cities.list" class="btn btn-secondary"> {{ \'actions.BACK\' | translate }} </a> <button type="submit" class="btn btn-success"> {{ \'actions.SAVE\' | translate }} </button> <button type="button" class="btn btn-danger" ng-hide="ctrl.city.create" ng-click="ctrl.remove(ctrl.city)"> {{ \'actions.DELETE\' | translate }} </button> </plm-panel-footer> </form> </plm-panel> </div> ');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('admin');
+} catch (e) {
+  module = angular.module('admin', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('app/pages/cities/city-tabs.html',
+    '<div ng-controller="citiesTabsController as ctrl"> <h1 class="content-title">{{ ctrl.title }}</h1> <div class="content"> <plume-tabs tabs="ctrl.tabs"></plume-tabs> <div ui-view></div> </div> </div> ');
 }]);
 })();
 
@@ -39421,7 +39817,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('app/pages/home/home.html',
-    '<div><h1 class="content-title">Home <small>Welcome in Plume Admin UI</small></h1></div>');
+    '<div> <h1 class="content-title"> Home <small>Welcome in Plume Admin UI</small> </h1> </div> ');
 }]);
 })();
 
@@ -39433,7 +39829,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('app/pages/login/login.html',
-    '<div id="login-container" ng-controller="loginController as loginCtrl"><h1>Plume Admin UI</h1><h2>{{ \'login.TITLE\' | translate }}</h2><form ng-submit="loginCtrl.login(loginCtrl.username)"><div class="errors" ng-show="loginCtrl.errorMessage">{{loginCtrl.errorMessage}}</div><div class="field-group"><input class="form-control" ng-model="loginCtrl.user.userName" placeholder="{{ \'login.IDENTIFIER\' | translate }}" required autofocus> <input type="password" class="form-control" ng-model="loginCtrl.user.password" placeholder="{{ \'login.PASSWORD\' | translate }}" required></div><button type="submit" class="btn btn-primary">{{ \'login.SIGNIN\' | translate }}</button></form></div>');
+    '<div id="login-container" ng-controller="loginController as loginCtrl"> <h1>Plume Admin UI</h1> <h2>{{ \'login.TITLE\' | translate }}</h2> <form ng-submit="loginCtrl.login(loginCtrl.username)"> <div class="errors" ng-show="loginCtrl.errorMessage"> {{loginCtrl.errorMessage}} </div> <div class="field-group"> <input class="form-control" ng-model="loginCtrl.user.userName" placeholder="{{ \'login.IDENTIFIER\' | translate }}" required autofocus> <input type="password" class="form-control" ng-model="loginCtrl.user.password" placeholder="{{ \'login.PASSWORD\' | translate }}" required> </div> <button type="submit" class="btn btn-primary">{{ \'login.SIGNIN\' | translate }}</button> </form> </div> ');
 }]);
 })();
 
@@ -39445,7 +39841,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('app/pages/roles/role-detail.html',
-    '<plm-panel title="{{ctrl.editTitle}}"><plm-panel-body><form class="form-horizontal"><plm-form-item label="{{ \'roles.LABEL\' | translate }}"><input class="form-control" ng-model="ctrl.edition.role.label" maxlength="30" size="30"></plm-form-item><plm-form-item label="{{ \'roles.AVAILABLE\' | translate }}"><select class="form-control" ng-model="ctrl.edition.available.selected" size="5" multiple><option ng-repeat="permission in ctrl.edition.available.list" value="{{permission}}">{{permission}}</option></select></plm-form-item><plm-form-item label="" class="text-center"><div><button class="btn btn-default" ng-click="ctrl.disablePermissions()"><i class="fa fa-angle-up" aria-hidden="true"></i></button> <button class="btn btn-default" ng-click="ctrl.disableAllPermissions()"><i class="fa fa-angle-double-up" aria-hidden="true"></i></button> <button class="btn btn-default" ng-click="ctrl.enablePermissions()"><i class="fa fa-angle-down" aria-hidden="true"></i></button> <button class="btn btn-default" ng-click="ctrl.enableAllPermissions()"><i class="fa fa-angle-double-down" aria-hidden="true"></i></button></div></plm-form-item><plm-form-item label="{{ \'roles.ENABLED\' | translate }}"><select class="form-control" ng-model="ctrl.edition.enabled.selected" size="5" multiple><option ng-repeat="permission in ctrl.edition.enabled.list" value="{{permission}}">{{permission}}</option></select></plm-form-item></form></plm-panel-body><plm-panel-footer><button type="button" class="btn btn-secondary" ng-click="ctrl.cancel()">{{\'actions.CANCEL\'|translate}}</button> <button type="button" class="btn btn-danger" ng-show="!ctrl.edition.role.isNew" ng-click="ctrl.delete()">{{\'actions.DELETE\'|translate}}</button> <button type="button" class="btn btn-success" ng-click="ctrl.save()">{{\'actions.SAVE\'|translate}}</button></plm-panel-footer></plm-panel>');
+    '<plm-panel title="{{ctrl.editTitle}}"> <plm-panel-body> <form class="form-horizontal"> <plm-form-item label="{{ \'roles.LABEL\' | translate }}"> <input class="form-control" ng-model="ctrl.edition.role.label" maxlength="30" size="30"> </plm-form-item> <plm-form-item label="{{ \'roles.AVAILABLE\' | translate }}"> <select class="form-control" ng-model="ctrl.edition.available.selected" size="5" multiple> <option ng-repeat="permission in ctrl.edition.available.list" value="{{permission}}"> {{permission}} </option> </select> </plm-form-item> <plm-form-item label="" class="text-center"> <div> <button class="btn btn-default" ng-click="ctrl.disablePermissions()"> <i class="fa fa-angle-up" aria-hidden="true"></i> </button> <button class="btn btn-default" ng-click="ctrl.disableAllPermissions()"> <i class="fa fa-angle-double-up" aria-hidden="true"></i> </button> <button class="btn btn-default" ng-click="ctrl.enablePermissions()"> <i class="fa fa-angle-down" aria-hidden="true"></i> </button> <button class="btn btn-default" ng-click="ctrl.enableAllPermissions()"> <i class="fa fa-angle-double-down" aria-hidden="true"></i> </button> </div> </plm-form-item> <plm-form-item label="{{ \'roles.ENABLED\' | translate }}"> <select class="form-control" ng-model="ctrl.edition.enabled.selected" size="5" multiple> <option ng-repeat="permission in ctrl.edition.enabled.list" value="{{permission}}"> {{permission}} </option> </select> </plm-form-item> </form> </plm-panel-body> <plm-panel-footer> <button type="button" class="btn btn-secondary" ng-click="ctrl.cancel()"> {{\'actions.CANCEL\'|translate}} </button> <button type="button" class="btn btn-danger" ng-show="!ctrl.edition.role.isNew" ng-click="ctrl.delete()"> {{\'actions.DELETE\'|translate}} </button> <button type="button" class="btn btn-success" ng-click="ctrl.save()"> {{\'actions.SAVE\'|translate}} </button> </plm-panel-footer> </plm-panel> ');
 }]);
 })();
 
@@ -39457,7 +39853,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('app/pages/roles/role-list.html',
-    '<plm-panel title="{{\'roles.LIST_TITLE\'|translate}}"><plm-panel-body><div class="table-responsive"><table class="table table-striped"><thead><tr><th>{{ \'roles.LABEL\' | translate }}</th><th>{{ \'roles.PERMISSIONS\' | translate }}</th></tr></thead><tbody><tr ng-repeat="role in ctrl.roles" ng-click="ctrl.edit(role)" style="cursor: pointer"><td>{{role.label}}</td><td>{{role.permissions.sort().join(\', \')}}</td></tr></tbody></table></div></plm-panel-body><plm-panel-footer><button type="button" class="btn btn-primary" ng-click="ctrl.create()">{{\'actions.NEW\'|translate}}</button></plm-panel-footer></plm-panel>');
+    '<plm-panel title="{{\'roles.LIST_TITLE\'|translate}}"> <plm-panel-body> <div class="table-responsive"> <table class="table table-striped"> <thead> <tr> <th>{{ \'roles.LABEL\' | translate }}</th> <th>{{ \'roles.PERMISSIONS\' | translate }}</th> </tr> </thead> <tbody> <tr ng-repeat="role in ctrl.roles" ng-click="ctrl.edit(role)" style="cursor: pointer"> <td>{{role.label}}</td> <td>{{role.permissions.sort().join(\', \')}}</td> </tr> </tbody> </table> </div> </plm-panel-body> <plm-panel-footer> <button type="button" class="btn btn-primary" ng-click="ctrl.create()">{{\'actions.NEW\'|translate}}</button> </plm-panel-footer> </plm-panel> ');
 }]);
 })();
 
@@ -39469,7 +39865,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('app/pages/roles/roles.html',
-    '<div ng-controller="rolesController as ctrl"><h1 class="content-title">Roles</h1><div class="content"><div class="row"><div class="col-sm-6" ng-include="\'app/pages/roles/role-list.html\'"></div><div class="col-sm-6" ng-show="ctrl.edition" ng-include="\'app/pages/roles/role-detail.html\'"></div></div></div></div>');
+    '<div ng-controller="rolesController as ctrl"> <h1 class="content-title">Roles</h1> <div class="content"> <div class="row"> <div class="col-sm-6" ng-include="\'app/pages/roles/role-list.html\'"></div> <div class="col-sm-6" ng-show="ctrl.edition" ng-include="\'app/pages/roles/role-detail.html\'"></div> </div> </div> </div> ');
 }]);
 })();
 
@@ -39481,7 +39877,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('app/pages/users/user-detail.html',
-    '<div ng-controller="usersDetailController as ctrl"><h1 class="content-title">{{ \'users.TITLE\' | translate }}</h1><div class="content" ng-include="\'app/pages/users/user-form.html\'"></div></div>');
+    '<div ng-controller="usersDetailController as ctrl"> <h1 class="content-title">{{ \'users.TITLE\' | translate }}</h1> <div class="content" ng-include="\'app/pages/users/user-form.html\'"></div> </div> ');
 }]);
 })();
 
@@ -39493,7 +39889,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('app/pages/users/user-form.html',
-    '<plm-panel title="{{ctrl.title}}"><form class="form-horizontal" ng-submit="ctrl.save(ctrl.user)"><plm-panel-body><plm-form-item label="{{ \'users.USERNAME\' | translate }}"><input class="form-control" ng-model="ctrl.user.userName"></plm-form-item><plm-form-item label="{{ \'users.EMAIL\' | translate }}"><input class="form-control" ng-model="ctrl.user.email"></plm-form-item><plm-form-item label="{{ \'users.FIRSTNAME\' | translate }}"><input class="form-control" ng-model="ctrl.user.firstName"></plm-form-item><plm-form-item label="{{ \'users.LASTNAME\' | translate }}"><input class="form-control" ng-model="ctrl.user.lastName"></plm-form-item><plm-form-item label="{{ \'users.ROLE\' | translate }}"><select class="form-control" ng-model="ctrl.user.idRole"><option ng-repeat="role in ctrl.rolesAvailable" value="{{role.id}}">{{role.label}}</option></select></plm-form-item><hr><plm-form-item label="{{ \'users.PASSWORD\' | translate }}"><input type="password" class="form-control" ng-model="ctrl.user.password"></plm-form-item><plm-form-item label="{{ \'users.PASSWORD_CONFIRM\' | translate }}"><input type="password" class="form-control" ng-model="ctrl.user.passwordConfirmation"></plm-form-item><hr ng-hide="ctrl.user.create"><plm-form-item label="{{ \'users.CREATION_DATE\' | translate }}" ng-hide="ctrl.user.create"><p class="form-control-static">{{ctrl.user.creationDate | date:"yyyy/MM/dd - hh:mm"}}</p></plm-form-item></plm-panel-body><plm-panel-footer><a ui-sref="app.users.list()" class="btn btn-secondary">{{ \'actions.BACK\' | translate }} </a><button type="submit" class="btn btn-success">{{ \'actions.SAVE\' | translate }}</button> <button type="button" class="btn btn-danger" ng-hide="ctrl.user.create" ng-click="ctrl.remove(ctrl.user)">{{ \'actions.DELETE\' | translate }}</button></plm-panel-footer></form></plm-panel>');
+    '<plm-panel title="{{ctrl.title}}"> <form class="form-horizontal" ng-submit="ctrl.save(ctrl.user)"> <plm-panel-body> <plm-form-item label="{{ \'users.USERNAME\' | translate }}"> <input class="form-control" ng-model="ctrl.user.userName"> </plm-form-item> <plm-form-item label="{{ \'users.EMAIL\' | translate }}"> <input class="form-control" ng-model="ctrl.user.email"> </plm-form-item> <plm-form-item label="{{ \'users.FIRSTNAME\' | translate }}"> <input class="form-control" ng-model="ctrl.user.firstName"> </plm-form-item> <plm-form-item label="{{ \'users.LASTNAME\' | translate }}"> <input class="form-control" ng-model="ctrl.user.lastName"> </plm-form-item> <plm-form-item label="{{ \'users.ROLE\' | translate }}"> <select class="form-control" ng-model="ctrl.user.idRole"> <option ng-repeat="role in ctrl.rolesAvailable" value="{{role.id}}">{{role.label}}</option> </select> </plm-form-item> <hr/> <plm-form-item label="{{ \'users.PASSWORD\' | translate }}"> <input type="password" class="form-control" ng-model="ctrl.user.password"> </plm-form-item> <plm-form-item label="{{ \'users.PASSWORD_CONFIRM\' | translate }}"> <input type="password" class="form-control" ng-model="ctrl.user.passwordConfirmation"> </plm-form-item> <hr ng-hide="ctrl.user.create"/> <plm-form-item label="{{ \'users.CREATION_DATE\' | translate }}" ng-hide="ctrl.user.create"> <p class="form-control-static">{{ctrl.user.creationDate | date:"yyyy/MM/dd - HH:mm"}}</p> </plm-form-item> </plm-panel-body> <plm-panel-footer> <a ui-sref="app.users.list()" class="btn btn-secondary"> {{ \'actions.BACK\' | translate }} </a> <button type="submit" class="btn btn-success"> {{ \'actions.SAVE\' | translate }} </button> <button type="button" class="btn btn-danger" ng-hide="ctrl.user.create" ng-click="ctrl.remove(ctrl.user)"> {{ \'actions.DELETE\' | translate }} </button> </plm-panel-footer> </form> </plm-panel> ');
 }]);
 })();
 
@@ -39505,7 +39901,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('app/pages/users/user-list.html',
-    '<div ng-controller="usersListController as ctrl"><h1 class="content-title">{{ \'users.TITLE\' | translate }}</h1><div class="content"><plm-panel title="{{\'users.LIST_TITLE\'|translate}}"><plm-panel-body><div class="table-responsive" ng-show="ctrl.users.length > 0"><table st-table="ctrl.displayedUsers" st-safe-src="ctrl.users" class="table table-striped"><thead><tr><th st-sort="userName">{{ \'users.USERNAME\' | translate }}</th><th st-sort="email">{{ \'users.EMAIL\' | translate }}</th><th st-sort="firstName">{{ \'users.FIRSTNAME\' | translate }}</th><th st-sort="lastName">{{ \'users.LASTNAME\' | translate }}</th></tr></thead><tbody><tr ng-repeat="row in ctrl.displayedUsers" style="cursor: pointer" ng-click="ctrl.displayUser(row.id)"><td>{{row.userName}}</td><td>{{row.email}}</td><td>{{row.firstName}}</td><td>{{row.lastName}}</td></tr></tbody></table></div><div ng-show="ctrl.users.length == 0">{{ \'users.EMPTY\' | translate }}</div></plm-panel-body><plm-panel-footer><a ui-sref="app.users.create()" class="btn btn-primary">{{ \'actions.NEW\' | translate }}</a></plm-panel-footer></plm-panel></div></div>');
+    '<div ng-controller="usersListController as ctrl"> <h1 class="content-title">{{ \'users.TITLE\' | translate }}</h1> <div class="content"> <plm-panel title="{{\'users.LIST_TITLE\'|translate}}"> <plm-panel-body> <div class="table-responsive" ng-show="ctrl.users.length > 0"> <table st-table="ctrl.displayedUsers" st-safe-src="ctrl.users" class="table table-striped"> <thead> <tr> <th st-sort="userName">{{ \'users.USERNAME\' | translate }}</th> <th st-sort="email">{{ \'users.EMAIL\' | translate }}</th> <th st-sort="firstName">{{ \'users.FIRSTNAME\' | translate }}</th> <th st-sort="lastName">{{ \'users.LASTNAME\' | translate }}</th> </tr> </thead> <tbody> <tr ng-repeat="row in ctrl.displayedUsers" style="cursor: pointer" ng-click="ctrl.displayUser(row.id)"> <td>{{row.userName}}</td> <td>{{row.email}}</td> <td>{{row.firstName}}</td> <td>{{row.lastName}}</td> </tr> </tbody> </table> </div> <div ng-show="ctrl.users.length == 0"> {{ \'users.EMPTY\' | translate }} </div> </plm-panel-body> <plm-panel-footer> <a ui-sref="app.users.create()" class="btn btn-primary">{{ \'actions.NEW\' | translate }}</a> </plm-panel-footer> </plm-panel> </div> </div> ');
 }]);
 })();
 
@@ -39517,6 +39913,6 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('app/pages/users/user-new.html',
-    '<div ng-controller="usersNewController as ctrl"><h1 class="content-title">{{ \'users.TITLE\' | translate }}</h1><div class="content" ng-include="\'app/pages/users/user-form.html\'"></div></div>');
+    '<div ng-controller="usersNewController as ctrl"> <h1 class="content-title">{{ \'users.TITLE\' | translate }}</h1> <div class="content" ng-include="\'app/pages/users/user-form.html\'"></div> </div> ');
 }]);
 })();

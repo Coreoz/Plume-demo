@@ -21,6 +21,8 @@ var excludeFiles = ['!'+source+'/node_modules/**'];
 var htmlminOptions = {
 	collapseBooleanAttributes: true,
 	collapseWhitespace: true,
+	conservativeCollapse: true,
+	keepClosingSlash: true,
 	removeAttributeQuotes: false,
 	removeComments: true,
 	removeEmptyAttributes: true,

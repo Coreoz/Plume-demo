@@ -48,11 +48,10 @@ public class CityWs {
 	@POST
 	@ApiOperation("Create or save a city")
 	@RestrictToAdmin(ProjectAdminPermissions.CITIES_ALTER)
-	public void save(CityWithImageUpload cityToSave) {
+	public CityWithImage save(CityWithImageUpload cityToSave) {
 		// If a validator fails, an exception is raised so the next instructions won't be called
 		Validators.checkRequired("City data", cityToSave.getData());
 		Validators.checkRequired("City name", cityToSave.getData().getName());
-		Validators.checkRequired("City active", cityToSave.getData().getActive());
 		if(cityToSave.getData().getId() == null) {
 			Validators.checkRequired("City image", cityToSave.getCityImage());
 		}
@@ -66,7 +65,12 @@ public class CityWs {
 		// - if the image is to large, the thumbnail saved in the database will be lighter.
 		// A good library to resize images is Thumbnailator.
 
-		cityService.save(cityToSave);
+		// by default a city is inactive
+		if(cityToSave.getData().getActive() == null) {
+			cityToSave.getData().setActive(false);
+		}
+
+		return cityService.save(cityToSave);
 	}
 
 	@DELETE

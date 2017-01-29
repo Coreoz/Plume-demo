@@ -63,14 +63,24 @@ app.config(function($stateProvider, $urlRouterProvider) {
 			url : '/',
 			templateUrl : 'app/pages/cities/city-list.html'
 		})
+		.state('app.cities.tabs', {
+			abstract : true,
+			url : '/:cityId',
+			templateUrl : 'app/pages/cities/city-tabs.html'
+		})
+		.state('app.cities.tabs.generaldata', {
+			url : '/info',
+			templateUrl : 'app/pages/cities/city-tab-general-data.html'
+		})
+		.state('app.cities.tabs.gallery', {
+			url : '/gallery',
+			templateUrl : 'app/pages/cities/city-tab-gallery.html'
+		})
 		.state('app.cities.create', {
 			url : '/new',
-			templateUrl : 'app/pages/cities/city-detail.html'
+			templateUrl : 'app/pages/cities/city-create.html'
 		})
-		.state('app.cities.detail', {
-			url : '/:cityId',
-			templateUrl : 'app/pages/cities/city-detail.html'
-		})
+		
 		
 		;
 });

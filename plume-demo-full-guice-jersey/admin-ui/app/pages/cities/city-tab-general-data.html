@@ -1,0 +1,33 @@
+<div ng-controller="citiesGeneralDataController as ctrl">
+	<plm-panel>
+		<form class="form-horizontal" ng-submit="ctrl.save(ctrl.city)">
+			<plm-panel-body>
+				<plm-form-item label="{{ 'cities.NAME' | translate }}">
+					<input type="text" class="form-control" ng-model="ctrl.city.data.name">
+				</plm-form-item>
+				<plm-form-item label="{{ 'cities.IMAGE' | translate }}">
+					<plume-media current-media-url="ctrl.city.cityImageUrl" accept="image/*" model="ctrl.city.cityImage" />
+				</plm-form-item>
+				<plm-form-item label="{{ 'cities.ACTIVE' | translate }}">
+					<input type="checkbox" class="form-control" ng-model="ctrl.city.data.active">
+				</plm-form-item>
+				<hr ng-hide="ctrl.city.create" />
+				<plm-form-item label="{{ 'cities.MODIFICATION_DATE' | translate }}" ng-hide="ctrl.city.create">
+					<p class="form-control-static">{{ctrl.city.data.lastModified | date:"yyyy/MM/dd - HH:mm"}}</p>
+				</plm-form-item>
+			</plm-panel-body>
+			<plm-panel-footer>
+				<a ui-sref="app.cities.list" class="btn btn-secondary">
+					{{ 'actions.BACK' | translate }}
+				</a>
+				<button type="submit" class="btn btn-success">
+					{{ 'actions.SAVE' | translate }}
+				</button>
+				<button type="button" class="btn btn-danger" ng-hide="ctrl.city.create" ng-click="ctrl.remove(ctrl.city)">
+					{{ 'actions.DELETE' | translate }}
+				</button>
+			</plm-panel-footer>
+		</form>
+	</plm-panel>
+</div>
+

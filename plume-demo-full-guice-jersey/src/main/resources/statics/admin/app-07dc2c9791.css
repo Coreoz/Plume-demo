@@ -265,7 +265,7 @@ html {
   width: device-width; }
 
 html {
-  font-size: 14px;
+  font-size: 16px;
   -ms-overflow-style: scrollbar;
   -webkit-tap-highlight-color: transparent; }
 
@@ -2729,7 +2729,7 @@ tbody.collapse.in {
   .nav-tabs .nav-item.open .nav-link:focus,
   .nav-tabs .nav-item.open .nav-link:hover {
     color: #55595c;
-    background-color: #eceeef;
+    background-color: #ffffff;
     border-color: #ddd #ddd transparent; }
   .nav-tabs .dropdown-menu {
     margin-top: -1px;
@@ -4181,7 +4181,7 @@ button.close {
   font-size: 1rem;
   background-color: #f7f7f7;
   border-bottom: 1px solid #ebebeb;
-  border-radius: 0.22857rem 0.22857rem 0 0; }
+  border-radius: 0.2375rem 0.2375rem 0 0; }
   .popover-title:empty {
     display: none; }
 
@@ -5295,6 +5295,12 @@ button.toast-close-button {
 :not(.no-enter)#toast-container > div.ng-enter {
   opacity: 0; }
 
+html {
+  font-size: 14px; }
+
+a {
+  cursor: pointer; }
+
 #app {
   margin: 0;
   height: 100vh;
@@ -5348,6 +5354,14 @@ button.toast-close-button {
         -moz-flex: 1 0 auto;
         -ms-flex: 1 0 auto;
         flex: 1 0 auto; }
+      #app > .admin-container > .admin-content-container > main,
+      #app > .admin-container > header > main {
+        -webkit-flex-basis: 0;
+        -moz-flex-basis: 0;
+        -ms-flex-preferred-size: 0;
+        flex-basis: 0;
+        width: 0;
+        /* to make sure the main container will never be larger than it should */ }
     #app > .admin-container > .admin-content-container {
       -webkit-box-flex: 1;
       -webkit-flex: 1 0 auto;
@@ -5417,12 +5431,7 @@ button.toast-close-button {
     background-color: transparent; }
 
 #app > .admin-container > header #aside-nav-toggle {
-  display: none;
-  margin-left: 1rem; }
-  #app > .admin-container > header #aside-nav-toggle .btn {
-    background: #fff; }
-    #app > .admin-container > header #aside-nav-toggle .btn:hover, #app > .admin-container > header #aside-nav-toggle .btn.active {
-      background: #eceeef; }
+  display: none; }
 
 @media (max-width: 767px) {
   #app > .admin-container > header {
@@ -5432,7 +5441,16 @@ button.toast-close-button {
       display: -webkit-flex;
       display: -moz-flex;
       display: -ms-flexbox;
-      display: flex; }
+      display: flex;
+      -webkit-flex-basis: 12rem;
+      -moz-flex-basis: 12rem;
+      -ms-flex-preferred-size: 12rem;
+      flex-basis: 12rem;
+      padding-left: 1rem; }
+      #app > .admin-container > header #aside-nav-toggle .btn {
+        background: #fff; }
+        #app > .admin-container > header #aside-nav-toggle .btn:hover, #app > .admin-container > header #aside-nav-toggle .btn.active {
+          background: #eceeef; }
     #app > .admin-container > header > #site-logo {
       -webkit-box-flex: 1;
       -webkit-flex: 1 0 auto;
@@ -5440,7 +5458,10 @@ button.toast-close-button {
       -moz-flex: 1 0 auto;
       -ms-flex: 1 0 auto;
       flex: 1 0 auto;
-      width: auto;
+      -webkit-flex-basis: 0;
+      -moz-flex-basis: 0;
+      -ms-flex-preferred-size: 0;
+      flex-basis: 0;
       background: transparent; }
     #app > .admin-container > header .site-name {
       display: none; }
@@ -5450,7 +5471,11 @@ button.toast-close-button {
       -moz-box-flex: 0;
       -moz-flex: 0 0 auto;
       -ms-flex: 0 0 auto;
-      flex: 0 0 auto; } }
+      flex: 0 0 auto;
+      -webkit-flex-basis: 12rem;
+      -moz-flex-basis: 12rem;
+      -ms-flex-preferred-size: 12rem;
+      flex-basis: 12rem; } }
 
 #main-content .content-title {
   margin-left: auto;
@@ -5500,6 +5525,14 @@ button.toast-close-button {
       text-align: center;
       background: #f7f7f9;
       border-top: 1px solid #eceeef; }
+
+#aside-nav > .nav {
+  -webkit-box-direction: normal;
+  -webkit-box-orient: vertical;
+  -webkit-flex-direction: column;
+  -moz-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column; }
 
 #aside-nav a {
   color: #eceeef;
@@ -5593,3 +5626,37 @@ button.toast-close-button {
   @media (max-width: 767px) {
     #login-container form {
       width: 100%; } }
+
+.media-file .media-preview {
+  max-width: 14rem;
+  max-height: 14rem; }
+
+.media-file div .media-file-input {
+  display: none; }
+
+.gallery-media {
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 1rem;
+  margin-bottom: 1rem; }
+  .gallery-media .media-preview-container {
+    width: 14rem;
+    height: 10rem; }
+    .gallery-media .media-preview-container .media-preview {
+      max-width: 100%;
+      max-height: 100%; }
+
+.cards-group .card {
+  display: inline-block;
+  margin-right: 1rem;
+  text-align: center;
+  width: 12rem; }
+  .cards-group .card .thumbnail-container {
+    height: 10rem; }
+    .cards-group .card .thumbnail-container > img {
+      max-width: 100%;
+      max-height: 100%; }
+  .cards-group .card .card-block .card-text {
+    font-weight: bold; }
+  .cards-group .card.inactive {
+    color: #ff0000; }

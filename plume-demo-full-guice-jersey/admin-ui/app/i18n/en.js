@@ -50,6 +50,9 @@ var translations_en = {
 		"NEW" : "New",
 		"CONFIRM" : "Confirm"
 	},
+	"file": {
+		"SELECT": "Select a file..."
+	},
 	"message" : {
 		"SUCCESS" : "Changes have been successfully saved",
 		"ERROR" : "An error append while saving changes"

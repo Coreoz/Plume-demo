@@ -32,8 +32,16 @@ app.service('citiesService', function ($resource, $q) {
 		'list': function() {
 			return fetchCities();
 		},
-		'save': function(city) {
-			return resource.save(city).$promise;
+		'save': function(cityToSave) {
+			return resource.save(cityToSave)
+				.$promise
+				.then(function(citySaved) {
+					if(cityToSave.create && cities != null) {
+						cities.push(citySaved);
+					}
+					
+					return citySaved;
+				});
 		},
 		'get': function(cityId) {
 			return currentCities()

@@ -4,5 +4,6 @@ public class ProjectAdminPermissions {
 
 	public static final String CITIES_ACCESS = "CITIES_ACCESS";
 	public static final String CITIES_ALTER = "CITIES_ALTER";
+	public static final String CITIES_GALLERY = "CITIES_GALLERY";
 
 }

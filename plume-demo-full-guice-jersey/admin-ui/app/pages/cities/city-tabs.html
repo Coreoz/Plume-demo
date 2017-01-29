@@ -1,0 +1,8 @@
+<div ng-controller="citiesTabsController as ctrl">
+	<h1 class="content-title">{{ ctrl.title }}</h1>
+
+	<div class="content">
+		<plume-tabs tabs="ctrl.tabs"></plume-tabs>
+		<div ui-view></div>
+	</div>
+</div>

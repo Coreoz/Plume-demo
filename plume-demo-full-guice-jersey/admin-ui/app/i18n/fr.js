@@ -42,6 +42,21 @@ var translations_fr = {
 		"NEW_TITLE" : "Creation d'un rôle",
 		"DELETE_CONFIRM": "Supprimer le rôle ?"
 	},
+	"cities": {
+		"TITLE": "Liste des villes",
+		"CREATE_TITLE": "Création d'une ville",
+		"DETAILS": "Détail de la ville {{name}}",
+		"NAME": "Nom",
+		"IMAGE": "Illustration",
+		"ACTIVE": "Ville active",
+		"MODIFICATION_DATE": "Date de modification",
+		"EMPTY_LIST": "Aucune ville n'a pour le moment été créée. Pour en ajouter une, cliquez sur le bouton 'Nouveau'.",
+		"DELETE_CONFIRM": "Confirmez la suppression de la ville ?",
+		"tab": {
+			"GENERAL_DATA": "Données générales",
+			"GALLERY": "Galerie"
+		}
+	},
 	"actions" : {
 		"BACK" : "Retour",
 		"CANCEL" : "Annuler",
@@ -49,6 +64,9 @@ var translations_fr = {
 		"DELETE" : "Supprimer",
 		"NEW" : "Nouveau",
 		"CONFIRM" : "Confirmer"
+	},
+	"file": {
+		"SELECT": "Sélectionner un fichier..."
 	},
 	"message" : {
 		"SUCCESS" : "Les modifications ont bien été prises en compte",
