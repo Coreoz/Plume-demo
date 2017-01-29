@@ -51,7 +51,9 @@ var translations_en = {
 		"CONFIRM" : "Confirm"
 	},
 	"file": {
-		"SELECT": "Select a file..."
+		"SELECT": "Select a file...",
+		"ADD_IMAGE": "Add an image",
+		"DELETE_MEDIA": "Delete media?"
 	},
 	"message" : {
 		"SUCCESS" : "Changes have been successfully saved",
@@ -72,3 +74,4 @@ var translations_en = {
 		"MESSAGE" : "{{field0}}"
 	}
 };
+

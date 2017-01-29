@@ -11,9 +11,10 @@
     "angular-smart-table": "2.1.8",
     "angular-translate": "2.13.1",
     "angular-ui-router": "0.4.2",
-    "angularjs-toaster": "^2.1.0",
+    "angularjs-toaster": "2.1.0",
     "bootstrap": "4.0.0-alpha.5",
     "font-awesome": "4.7.0",
+    "gulp-sourcemaps": "2.4.0",
     "ng-dialog": "0.6.4",
     "ngstorage": "0.3.11"
   },

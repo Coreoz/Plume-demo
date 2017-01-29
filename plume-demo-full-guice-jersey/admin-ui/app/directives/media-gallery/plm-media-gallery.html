@@ -1,0 +1,24 @@
+<plm-panel>
+	<plm-panel-body class="gallery-medias">
+		<div ng-repeat="media in medias" class="gallery-media">
+			<div class="btn-group" role="group">
+				<a class="btn btn-success" target="_blank" ng-href="{{media.fileUrl}}">
+					<span class="fa fa-download" aria-hidden="true"></span>
+				</a>
+				<button type="button" class="btn btn-danger" ng-click="internalDeleteMedia(media)">
+					{{ 'actions.DELETE' | translate }}
+				</button>
+			</div>
+			<div ng-show="isImage" class="media-preview-container">
+				<img class="media-preview" ng-src="{{media.fileUrl}}" />
+			</div>
+		</div>
+	</plm-panel-body>
+	<plm-panel-footer class="gallery-media-actions">
+		<label class="btn btn-primary">
+			{{ 'file.ADD_IMAGE' | translate }}
+			<input class="media-file-input" accept="{{accept}}" type="file" on-after-validate="mediaLoaded" ng-model="unusedMediaModel" base-sixty-four-input />
+		</label>
+	</plm-panel-footer>
+</plm-panel>
+

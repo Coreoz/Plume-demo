@@ -1,11 +1,14 @@
+.media-file,
+.gallery-media-actions {
+  .media-file-input {
+    display: none;
+  }
+}
+
 .media-file {
   .media-preview {
     max-width: 14rem;
     max-height: 14rem;
-  }
-
-  div .media-file-input {
-    display: none;
   }
 }
 

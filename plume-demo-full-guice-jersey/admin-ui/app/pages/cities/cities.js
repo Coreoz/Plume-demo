@@ -93,3 +93,10 @@ app.controller('citiesGeneralDataController', function($stateParams, $state, uiS
 	};
 
 });
+
+app.controller('citiesGalleryController', function($stateParams, fileGalleryService) {
+
+	this.galleryService = fileGalleryService.build('CITY_GALLERY', $stateParams.cityId);
+
+});
+

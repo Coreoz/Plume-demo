@@ -1,20 +1,8 @@
-<plm-panel>
-<!-- 	<form class="form-horizontal" ng-submit="ctrl.save(ctrl.user)"> -->
-		<plm-panel-body>
-			Body gallery
-		</plm-panel-body>
-		<plm-panel-footer>
-			Actions
-<!-- 			<a ui-sref="app.users.list()" class="btn btn-secondary"> -->
-<!-- 				{{ 'actions.BACK' | translate }} -->
-<!-- 			</a> -->
-<!-- 			<button type="submit" class="btn btn-success"> -->
-<!-- 				{{ 'actions.SAVE' | translate }} -->
-<!-- 			</button> -->
-<!-- 			<button type="button" class="btn btn-danger" ng-hide="ctrl.user.create" ng-click="ctrl.remove(ctrl.user)"> -->
-<!-- 				{{ 'actions.DELETE' | translate }} -->
-<!-- 			</button> -->
-		</plm-panel-footer>
-<!-- 	</form> -->
-</plm-panel>
-
+<div ng-controller="citiesGalleryController as ctrl">
+	<plume-media-gallery
+		insert-media="ctrl.galleryService.add"
+		delete-media="ctrl.galleryService.delete"
+		load-medias="ctrl.galleryService.get"
+		accept="image/*"
+	></plume-media-gallery>
+</div>

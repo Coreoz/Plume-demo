@@ -39757,7 +39757,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('app/pages/cities/city-create.html',
-    '<div> <h1 class="content-title">{{ \'cities.CREATE_TITLE\' | translate }}</h1> <div class="content"> <div ng-include="\'app/pages/cities/city-tab-general-data.html\'"></div> </div> </div>');
+    '<div> <h1 class="content-title">{{ \'cities.CREATE_TITLE\' | translate }}</h1> <div class="content"> <div ng-include="\'app/pages/cities/city-tab-general-data.html\'"></div> </div> </div> ');
 }]);
 })();
 
