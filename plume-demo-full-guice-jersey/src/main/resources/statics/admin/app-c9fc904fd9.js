@@ -79,7 +79,9 @@ var translations_fr = {
 		"CONFIRM" : "Confirmer"
 	},
 	"file": {
-		"SELECT": "Sélectionner un fichier..."
+		"SELECT": "Sélectionner un fichier...",
+		"ADD_IMAGE": "Ajouter une image",
+		"DELETE_MEDIA": "Supprimer le média ?"
 	},
 	"message" : {
 		"SUCCESS" : "Les modifications ont bien été prises en compte",
@@ -100,6 +102,7 @@ var translations_fr = {
 		"MESSAGE" : "{{field0}}"
 	}
 };
+
 
 var translations_en = {
 	"aside" : {
@@ -154,7 +157,9 @@ var translations_en = {
 		"CONFIRM" : "Confirm"
 	},
 	"file": {
-		"SELECT": "Select a file..."
+		"SELECT": "Select a file...",
+		"ADD_IMAGE": "Add an image",
+		"DELETE_MEDIA": "Delete media?"
 	},
 	"message" : {
 		"SUCCESS" : "Changes have been successfully saved",
@@ -175,6 +180,7 @@ var translations_en = {
 		"MESSAGE" : "{{field0}}"
 	}
 };
+
 
 /**
  * @license AngularJS v1.6.0
@@ -38889,6 +38895,73 @@ app
 
 'use strict';
 
+app
+.directive('plumeMediaGallery', function() {
+	return {
+		restrict: 'E',
+		scope: {
+			attachedData: '=', // data object to be attached to the gallery context
+			insertMedia: '=', // function called when a media is attached ; returns a promise to a null object and use parameters : mediaUpload, attachedData
+			deleteMedia: '=', // function called when a media is deleted ; returns a promise to a null object and use parameters : mediaFile, attachedData
+			loadMedias: '=', // function called to load medias ; returns a promise to a list of mediaFile and use parameters : attachedData
+			accept: '@' // by default: *
+		},
+		templateUrl: 'app/directives/media-gallery/plm-media-gallery.html',
+		controller: function($scope, $translate, uiService) {
+			var loadMediasInternal = function(loadMedias, attachedData) {
+				loadMedias(attachedData)
+					.then(function(medias) {
+						$scope.medias = medias;
+					});
+			};
+			
+			$scope.medias = [];
+			
+			$scope.isImage = $scope.accept && $scope.accept.startsWith('image');
+			
+			$scope.$watch('attachedData', function(attachedData) {
+				loadMediasInternal($scope.loadMedias, attachedData);
+			});
+			
+			$scope.internalDeleteMedia = function(media) {
+				uiService
+					.withConfirmation($translate.instant('file.DELETE_MEDIA'))
+					.then(function() {
+						uiService
+							.withPromise($scope.deleteMedia(media.idFile, $scope.attachedData), true)
+							.then(function() {
+								loadMediasInternal($scope.loadMedias, $scope.attachedData);
+							})
+							.catch(angular.noop);
+					})
+					.catch(angular.noop);
+			};
+			
+			$scope.mediaLoaded = function(event, fileBase64) {
+				if(fileBase64.length > 0) {
+					uiService
+						.withPromise(
+							$scope
+								.insertMedia(
+									{
+										data: fileBase64[0],
+										initialPosition: $scope.medias.length
+									},
+									$scope.attachedData
+								),
+							true
+						)
+						.then(function() {
+							loadMediasInternal($scope.loadMedias, $scope.attachedData);
+						});
+				}
+			};
+		}
+	};
+});
+
+'use strict';
+
 /**
  * tabs format :
  * [
@@ -39106,6 +39179,46 @@ app.service('sessionService', function ($sessionStorage) {
 		}
 		return false;
 	};
+
+});
+
+'use strict';
+
+app.service('fileGalleryService', function ($resource) {
+	
+	var resource = $resource('/api/admin/galleries/:galleryType/:idFile', null, {
+		'get': { method: 'GET', isArray: true},
+		'add': { method: 'POST'},
+		'delete': { method: 'DELETE'}
+	});
+	
+	var that = this;
+	
+	this.get = function(galleryType, idData) {
+		return resource.get({galleryType: galleryType, idData: idData}).$promise;
+	};
+	
+	this.add = function(galleryType, idData, data) {
+		return resource.add({galleryType: galleryType, idData: idData}, data).$promise;
+	};
+	
+	this.delete = function(galleryType, idData, idFile) {
+		return resource.delete({galleryType: galleryType, idData: idData, idFile: idFile}).$promise;
+	};
+	
+	this.build = function(galleryType, idData) {
+		return {
+			'get': function() {
+				return that.get(galleryType, idData);
+			},
+			'add': function(data) {
+				return that.add(galleryType, idData, data);
+			},
+			'delete': function(idFile) {
+				return that.delete(galleryType, idData, idFile);
+			}
+		};
+	}
 
 });
 
@@ -39641,6 +39754,13 @@ app.controller('citiesGeneralDataController', function($stateParams, $state, uiS
 
 });
 
+app.controller('citiesGalleryController', function($stateParams, fileGalleryService) {
+
+	this.galleryService = fileGalleryService.build('CITY_GALLERY', $stateParams.cityId);
+
+});
+
+
 (function(module) {
 try {
   module = angular.module('admin');
@@ -39685,7 +39805,19 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('app/directives/media/plm-media.html',
-    '<div class="media-file"> <div class="btn-group"> <a class="btn btn-icon btn-success" target="_blank" ng-href="{{currentMediaUrl}}" ng-if="currentMediaUrl"> <i class="fa fa-download" aria-hidden="true"></i> </a> <label class="btn btn-primary"> {{ \'file.SELECT\' | translate }} <input class="media-file-input" accept="{{accept}}" type="file" ng-model="mediaModel" base-sixty-four-input> </label> </div> <div ng-show="filename"> {{ filename }} </div> <div ng-show="isImage && previewHref"> <img class="media-preview" ng-src="{{previewHref}}"/> </div> </div> ');
+    '<div class="media-file"> <div class="btn-group"> <a class="btn btn-success" target="_blank" ng-href="{{currentMediaUrl}}" ng-if="currentMediaUrl"> <i class="fa fa-download" aria-hidden="true"></i> </a> <label class="btn btn-primary"> {{ \'file.SELECT\' | translate }} <input class="media-file-input" accept="{{accept}}" type="file" ng-model="mediaModel" base-sixty-four-input> </label> </div> <div ng-show="filename"> {{ filename }} </div> <div ng-show="isImage && previewHref"> <img class="media-preview" ng-src="{{previewHref}}"/> </div> </div> ');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('admin');
+} catch (e) {
+  module = angular.module('admin', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('app/directives/media-gallery/plm-media-gallery.html',
+    '<plm-panel> <plm-panel-body class="gallery-medias"> <div ng-repeat="media in medias" class="gallery-media"> <div class="btn-group" role="group"> <a class="btn btn-success" target="_blank" ng-href="{{media.fileUrl}}"> <span class="fa fa-download" aria-hidden="true"></span> </a> <button type="button" class="btn btn-danger" ng-click="internalDeleteMedia(media)"> {{ \'actions.DELETE\' | translate }} </button> </div> <div ng-show="isImage" class="media-preview-container"> <img class="media-preview" ng-src="{{media.fileUrl}}"/> </div> </div> </plm-panel-body> <plm-panel-footer class="gallery-media-actions"> <label class="btn btn-primary"> {{ \'file.ADD_IMAGE\' | translate }} <input class="media-file-input" accept="{{accept}}" type="file" on-after-validate="mediaLoaded" ng-model="unusedMediaModel" base-sixty-four-input/> </label> </plm-panel-footer> </plm-panel> ');
 }]);
 })();
 
@@ -39781,7 +39913,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('app/pages/cities/city-tab-gallery.html',
-    '<plm-panel> <plm-panel-body> Body gallery </plm-panel-body> <plm-panel-footer> Actions </plm-panel-footer> </plm-panel> ');
+    '<div ng-controller="citiesGalleryController as ctrl"> <plume-media-gallery insert-media="ctrl.galleryService.add" delete-media="ctrl.galleryService.delete" load-medias="ctrl.galleryService.get" accept="image/*"></plume-media-gallery> </div> ');
 }]);
 })();
 

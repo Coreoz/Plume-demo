@@ -5627,12 +5627,13 @@ a {
     #login-container form {
       width: 100%; } }
 
+.media-file .media-file-input,
+.gallery-media-actions .media-file-input {
+  display: none; }
+
 .media-file .media-preview {
   max-width: 14rem;
   max-height: 14rem; }
-
-.media-file div .media-file-input {
-  display: none; }
 
 .gallery-media {
   display: inline-block;
