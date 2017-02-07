@@ -47,7 +47,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>${package}.WebApplication</mainClass>
+							<mainClass>com.coreoz.demo.WebApplication</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>
