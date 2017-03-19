@@ -43,7 +43,7 @@ public class QuerydslGenerator {
 		configuration.registerNumeric(19, 0, Long.class);
 
 		MetaDataExporter exporter = new MetaDataExporter();
-		exporter.setPackageName("org.plume.demo.db.generated");
+		exporter.setPackageName("com.coreoz.demo.db.generated");
 		exporter.setTargetFolder(new File("src/main/java"));
 		exporter.setTableNamePattern(TABLES_PREFIX + "%");
 		exporter.setNamingStrategy(new DefaultNamingStrategy() {
