@@ -12,7 +12,7 @@ app.controller('usersListController', function(uiService, usersService, $state) 
 			that.users = response;
 			that.displayedUsers = [].concat(response);
 		})
-		.catch(angular.noop);
+		.catch(console.log);
 
 	this.displayUser = function(id) {
 		$state.go("app.users.detail", {userId: id});
@@ -37,12 +37,12 @@ app.controller('usersDetailController', function($stateParams, $state, uiService
 				that.title = title;
 			});
 		})
-		.catch(angular.noop);
+		.catch(console.log);
 
 	this.save = function(user) {
 		uiService
 			.withPromise(usersService.update(user), true)
-			.catch(angular.noop);
+			.catch(console.log);
 	};
 	
 	this.remove = function(user) {
@@ -55,9 +55,9 @@ app.controller('usersDetailController', function($stateParams, $state, uiService
 						.then(function() {
 							$state.go('app.users.list');
 						})
-						.catch(angular.noop);
+						.catch(console.log);
 				})
-				.catch(angular.noop);
+				.catch(console.log);
 		});
 	};
 
@@ -74,7 +74,7 @@ app.controller('usersNewController', function($state, uiService, usersService, $
 		.then(function(roles) {
 			that.rolesAvailable = roles;
 		})
-		.catch(angular.noop);
+		.catch(console.log);
 	
 	$translate('users.NEW_TITLE').then(function(title) {
 		that.title = title;
@@ -86,7 +86,7 @@ app.controller('usersNewController', function($state, uiService, usersService, $
 			.then(function(result) {
 				$state.go('app.users.list');
 			})
-			.catch(angular.noop);
+			.catch(console.log);
 	};
 
 });

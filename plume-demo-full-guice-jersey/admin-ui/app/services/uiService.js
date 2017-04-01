@@ -13,6 +13,7 @@ app.service('uiService', function($q, toaster, $translate, i18nService, ngDialog
 				return response;
 			}, function(error) {
 				if (!error || !error.data) {
+					console.log(error);
 					toaster.pop('error', '', "Unknown error");
 					return $q.reject({});
 				}

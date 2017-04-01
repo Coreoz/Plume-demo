@@ -37,9 +37,9 @@ app
 							.then(function() {
 								loadMediasInternal($scope.loadMedias, $scope.attachedData);
 							})
-							.catch(angular.noop);
+							.catch(console.log);
 					})
-					.catch(angular.noop);
+					.catch(console.log);
 			};
 			
 			$scope.mediaLoaded = function(event, fileBase64) {
@@ -64,3 +64,4 @@ app
 		}
 	};
 });
+

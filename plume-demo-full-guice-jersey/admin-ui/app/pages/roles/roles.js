@@ -17,7 +17,7 @@ app
 				permissionsAvailable = data.permissionsAvailable.sort();
 				that.edition = null;
 			})
-			.catch(angular.noop);
+			.catch(console.log);
 	};
 	loadRolesAndPermissions();
 	
@@ -56,7 +56,7 @@ app
 		uiService
 			.withPromise(roleService.save(that.edition.role), true)
 			.then(loadRolesAndPermissions)
-			.catch(angular.noop);
+			.catch(console.log);
 	};
 	
 	this.delete = function() {
@@ -67,9 +67,9 @@ app
 					uiService
 						.withPromise(roleService.delete(that.edition.role.idRole), true)
 						.then(loadRolesAndPermissions)
-						.catch(angular.noop);
+						.catch(console.log);
 				})
-				.catch(angular.noop);
+				.catch(console.log);
 		});
 	};
 	

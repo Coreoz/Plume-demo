@@ -108,7 +108,7 @@ var browserSync = require('browser-sync').create();
 var watch = require('gulp-watch');
 
 gulp.task('sass', function() {
-	gulp
+	return gulp
 		.src('app/sass/**/*.scss')
 		.pipe(sourcemaps.init())
 		.pipe(sass().on('error', sass.logError))
