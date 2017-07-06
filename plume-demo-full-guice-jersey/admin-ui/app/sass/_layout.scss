@@ -30,10 +30,11 @@
       &>main {
         @include flex(1, 0, auto);
       }
-     
+
      &>main {
        @include flex-basis(0);
        width: 0; /* to make sure the main container will never be larger than it should */
+       overflow: auto;
      }
     }
 
@@ -58,5 +59,12 @@
         }
       }
     }
+  }
+}
+
+/* Hack IE :( */
+@media all and (-ms-high-contrast:none) {
+  #app &>.admin-container {
+    height: 100vh;
   }
 }

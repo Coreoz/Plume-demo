@@ -5361,7 +5361,8 @@ a {
         -ms-flex-preferred-size: 0;
         flex-basis: 0;
         width: 0;
-        /* to make sure the main container will never be larger than it should */ }
+        /* to make sure the main container will never be larger than it should */
+        overflow: auto; }
     #app > .admin-container > .admin-content-container {
       -webkit-box-flex: 1;
       -webkit-flex: 1 0 auto;
@@ -5380,6 +5381,11 @@ a {
             top: 0;
             bottom: 0;
             z-index: 1; } }
+
+/* Hack IE :( */
+@media all and (-ms-high-contrast: none) {
+  #app > .admin-container {
+    height: 100vh; } }
 
 #app > .admin-container > header #site-logo,
 #app > .admin-container > header #header-nav,
