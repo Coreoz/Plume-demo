@@ -12,9 +12,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import com.coreoz.demo.services.configuration.ConfigurationService;
-import com.coreoz.plume.admin.jersey.WebSessionPermission;
 import com.coreoz.plume.admin.services.permissions.AdminPermissions;
 import com.coreoz.plume.admin.webservices.SessionWs;
+import com.coreoz.plume.admin.websession.WebSessionPermission;
 import com.coreoz.plume.jersey.security.basic.BasicAuthenticator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableSet;

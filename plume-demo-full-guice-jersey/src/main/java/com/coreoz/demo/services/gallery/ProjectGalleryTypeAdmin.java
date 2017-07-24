@@ -5,7 +5,7 @@ import java.util.function.Predicate;
 
 import com.coreoz.demo.db.generated.QCity;
 import com.coreoz.demo.webservices.admin.permissions.ProjectAdminPermissions;
-import com.coreoz.plume.admin.jersey.WebSessionPermission;
+import com.coreoz.plume.admin.websession.WebSessionPermission;
 import com.coreoz.plume.file.gallery.webservices.permissions.FileGalleryTypeAdmin;
 import com.coreoz.plume.file.gallery.webservices.permissions.FilenamePredicates;
 import com.querydsl.core.types.dsl.NumberPath;

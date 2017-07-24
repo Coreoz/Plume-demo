@@ -13,9 +13,9 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.glassfish.jersey.server.ResourceConfig;
 
-import com.coreoz.plume.admin.jersey.WebSessionPermission;
+import com.coreoz.plume.admin.jersey.feature.AdminSecurityFeature;
 import com.coreoz.plume.admin.webservices.context.WebSessionAdminFactory;
-import com.coreoz.plume.admin.webservices.security.AdminSecurityFeature;
+import com.coreoz.plume.admin.websession.WebSessionPermission;
 import com.coreoz.plume.file.gallery.webservices.FileGalleryAdminWs;
 import com.coreoz.plume.file.webservices.FileWs;
 import com.coreoz.plume.jersey.errors.WsResultExceptionMapper;

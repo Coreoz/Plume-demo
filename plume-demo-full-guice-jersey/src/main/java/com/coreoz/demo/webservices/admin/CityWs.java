@@ -17,7 +17,7 @@ import com.coreoz.demo.services.city.CityService;
 import com.coreoz.demo.services.city.CityWithImage;
 import com.coreoz.demo.services.city.CityWithImageUpload;
 import com.coreoz.demo.webservices.admin.permissions.ProjectAdminPermissions;
-import com.coreoz.plume.admin.webservices.security.RestrictToAdmin;
+import com.coreoz.plume.admin.jersey.feature.RestrictToAdmin;
 import com.coreoz.plume.jersey.errors.Validators;
 
 import io.swagger.annotations.Api;
