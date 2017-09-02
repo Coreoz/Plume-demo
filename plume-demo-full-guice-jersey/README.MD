@@ -24,7 +24,7 @@ Then the browser should prompt for credentials:
 - login: plume
 - password: rocks
 
-To test the administration web-service like `GET /admin/city`:
+To test an administration web-service like `GET /admin/city`:
 1. Call the `POST /admin/session` web-service with the credentials admin//admin
 2. Copy the JWT token returned
 3. At the top of the Swagger page, click on the Authorize button
