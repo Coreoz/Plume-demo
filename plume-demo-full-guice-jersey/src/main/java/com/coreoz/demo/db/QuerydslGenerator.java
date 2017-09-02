@@ -25,7 +25,7 @@ import com.querydsl.sql.types.Type;
 /**
  * Generate Querydsl classes for the database layer.
  *
- * Run the {@link #main(String...)} method from your IDE to regenerate Querydsl classes.
+ * Run the {@link #main()} method from your IDE to regenerate Querydsl classes.
  */
 public class QuerydslGenerator {
 
