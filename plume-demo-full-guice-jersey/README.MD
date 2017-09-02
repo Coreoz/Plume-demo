@@ -20,6 +20,7 @@ Swagger documentation
 It is available through the URL:
 - for the public area: <http://localhost:8080/webjars/swagger-ui/2.2.10-1/index.html?url=/api/swagger>
 - for the admin area: <http://localhost:8080/webjars/swagger-ui/2.2.10-1/index.html?url=/api/swaggerAdmin>
+
 Then the browser should prompt for credentials:
 - login: plume
 - password: rocks
