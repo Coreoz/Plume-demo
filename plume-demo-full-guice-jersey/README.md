@@ -4,6 +4,7 @@ A demo application of the whole Plume ecosystem
 This project makes use of the Plume ecosystem main modules:
 - [Plume Framework](https://github.com/Coreoz/Plume): the lightweight modular Java framework
 - [Plume Admin](https://github.com/Coreoz/Plume-admin): provides Jersey web services to build an administration area
+- [Plume Admin UI AngularJS](https://github.com/Coreoz/Plume-admin-ui-angularjs): a JavaScript frontend for Plume Admin written with AngularJS.
 - [Plume File](https://github.com/Coreoz/Plume-file): a group of modules to manage files
 
 Running the application
