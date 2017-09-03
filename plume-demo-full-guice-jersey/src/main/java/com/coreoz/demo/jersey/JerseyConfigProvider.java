@@ -1,13 +1,8 @@
 package com.coreoz.demo.jersey;
 
-import java.io.IOException;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ContainerResponseFilter;
 
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
@@ -15,6 +10,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 
 import com.coreoz.plume.admin.jersey.feature.AdminSecurityFeature;
 import com.coreoz.plume.admin.webservices.context.WebSessionAdminFactory;
+import com.coreoz.plume.admin.webservices.security.WebSessionAdmin;
 import com.coreoz.plume.admin.websession.WebSessionPermission;
 import com.coreoz.plume.file.gallery.webservices.FileGalleryAdminWs;
 import com.coreoz.plume.file.webservices.FileWs;
@@ -35,19 +31,6 @@ public class JerseyConfigProvider implements Provider<ResourceConfig> {
 	public JerseyConfigProvider(ObjectMapper objectMapper) {
 		config = new ResourceConfig();
 
-		// to run the admin ui app separately, if included the java project,
-		// these lines can be deleted
-		config.register(new ContainerResponseFilter() {
-			@Override
-			public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
-					throws IOException {
-				responseContext.getHeaders().add("Access-Control-Allow-Origin", "*");
-				responseContext.getHeaders().add("Access-Control-Allow-Headers", "origin, content-type, accept, authorization");
-				responseContext.getHeaders().add("Access-Control-Allow-Credentials", "true");
-				responseContext.getHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
-			}
-		});
-
 		// this package will be scanned by Jersey to discover web-service classes
 		config.packages("com.coreoz.demo.webservices");
 		// admin web-services
@@ -61,6 +44,7 @@ public class JerseyConfigProvider implements Provider<ResourceConfig> {
 			@Override
 			protected void configure() {
 				bindFactory(WebSessionAdminFactory.class).to(WebSessionPermission.class).in(RequestScoped.class);
+				bindFactory(WebSessionAdminFactory.class).to(WebSessionAdmin.class).in(RequestScoped.class);
 			}
 		});
 

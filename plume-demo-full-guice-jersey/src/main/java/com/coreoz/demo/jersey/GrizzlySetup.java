@@ -6,7 +6,6 @@ import java.net.URI;
 import javax.ws.rs.core.UriBuilder;
 
 import org.glassfish.grizzly.http.server.CLStaticHttpHandler;
-import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -45,10 +44,11 @@ public class GrizzlySetup {
 		httpServer.getServerConfiguration().setDefaultErrorPageGenerator(new GrizzlyErrorPageHandler());
 
 		// webjars for swagger ui
-		HttpHandler webJarHandler = new CLStaticHttpHandler(
+		CLStaticHttpHandler webJarHandler = new CLStaticHttpHandler(
 			GrizzlySetup.class.getClassLoader(),
 			"META-INF/resources/webjars/"
 		);
+		webJarHandler.setFileCacheEnabled(false);
 		httpServer.getServerConfiguration().addHttpHandler(webJarHandler, "/webjars/");
 
 		// static resources

@@ -105,6 +105,7 @@ gulp.task('build', ['clean', 'css', 'js', 'indexHtml', 'copy']);
 var sass = require('gulp-sass');
 var sourcemaps = require('gulp-sourcemaps');
 var browserSync = require('browser-sync').create();
+var proxy = require('proxy-middleware');
 var watch = require('gulp-watch');
 
 gulp.task('sass', function() {
@@ -121,7 +122,14 @@ gulp.task('serve', ['sass'], function () {
 	browserSync.init({
 		server: {
 			baseDir: "./"
-		}
+		},
+		middleware: [proxy({
+			protocol: 'http:',
+			hostname: 'localhost',
+			port: '8080',
+			pathname: '/api',
+			route: '/api'
+		})]
 	});
 
 	watch('app/sass/**/*.scss', function() { gulp.start('sass'); });

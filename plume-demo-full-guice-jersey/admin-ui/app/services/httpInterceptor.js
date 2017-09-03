@@ -4,11 +4,6 @@ app
 .factory('httpInterceptor', function ($q, $rootScope, sessionService) {
 	return {
 		request: function (config) {
-			// base URL
-			if(config.url.indexOf('/api') == 0) {
-				config.url = CONST.BASE_URL+config.url;
-			}
-
 			// access checking
 			if(sessionService.isConnected()) {
 				config.headers = config.headers || {}
