@@ -20,7 +20,7 @@ import java.sql.Types;
 @Generated("com.querydsl.sql.codegen.MetaDataSerializer")
 public class QCity extends com.querydsl.sql.RelationalPathBase<City> {
 
-    private static final long serialVersionUID = -1158148426;
+    private static final long serialVersionUID = 1643343782;
 
     public static final QCity city = new QCity("demo_city");
 
@@ -30,7 +30,7 @@ public class QCity extends com.querydsl.sql.RelationalPathBase<City> {
 
     public final NumberPath<Long> idFileImage = createNumber("idFileImage", Long.class);
 
-    public final DateTimePath<java.time.LocalDateTime> lastModified = createDateTime("lastModified", java.time.LocalDateTime.class);
+    public final DateTimePath<java.time.Instant> lastModified = createDateTime("lastModified", java.time.Instant.class);
 
     public final StringPath name = createString("name");
 
