@@ -22,7 +22,7 @@ public class City extends com.coreoz.plume.db.querydsl.crud.CrudEntityQuerydsl {
     private Long idFileImage;
 
     @Column("last_modified")
-    private java.time.LocalDateTime lastModified;
+    private java.time.Instant lastModified;
 
     @Column("name")
     private String name;
@@ -51,11 +51,11 @@ public class City extends com.coreoz.plume.db.querydsl.crud.CrudEntityQuerydsl {
         this.idFileImage = idFileImage;
     }
 
-    public java.time.LocalDateTime getLastModified() {
+    public java.time.Instant getLastModified() {
         return lastModified;
     }
 
-    public void setLastModified(java.time.LocalDateTime lastModified) {
+    public void setLastModified(java.time.Instant lastModified) {
         this.lastModified = lastModified;
     }
 

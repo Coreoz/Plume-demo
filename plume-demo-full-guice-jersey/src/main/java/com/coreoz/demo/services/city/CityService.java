@@ -52,7 +52,7 @@ public class CityService extends CrudService<City> {
 				// you will then need to implement currentFileImageId() in the DAO
 				.orElse(cityToSave.getData().getIdFileImage())
 		);
-		cityToSave.getData().setLastModified(timeProvider.currentDateTime());
+		cityToSave.getData().setLastModified(timeProvider.currentInstant());
 
 		return toCityWithImage(cityDao.save(cityToSave.getData()));
 	}

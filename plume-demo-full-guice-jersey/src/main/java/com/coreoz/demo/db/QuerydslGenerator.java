@@ -16,7 +16,7 @@ import com.querydsl.sql.Configuration;
 import com.querydsl.sql.SQLTemplates;
 import com.querydsl.sql.codegen.DefaultNamingStrategy;
 import com.querydsl.sql.codegen.MetaDataExporter;
-import com.querydsl.sql.types.JSR310LocalDateTimeType;
+import com.querydsl.sql.types.JSR310InstantType;
 import com.querydsl.sql.types.JSR310LocalDateType;
 import com.querydsl.sql.types.JSR310LocalTimeType;
 import com.querydsl.sql.types.JSR310ZonedDateTimeType;
@@ -33,7 +33,7 @@ public class QuerydslGenerator {
 
 	public static void main(String... args) {
 		Configuration configuration = new Configuration(SQLTemplates.DEFAULT);
-		configuration.register(classType(JSR310LocalDateTimeType.class));
+		configuration.register(classType(JSR310InstantType.class));
 		configuration.register(classType(JSR310LocalDateType.class));
 		configuration.register(classType(JSR310LocalTimeType.class));
 		configuration.register(classType(JSR310ZonedDateTimeType.class));
