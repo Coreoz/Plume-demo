@@ -5,7 +5,7 @@
   "author": "Aurélien Manteaux",
   "license": "Apache License 2",
   "dependencies": {
-    "angular": "1.6.0",
+    "angular": "1.7.9",
     "angular-base64-upload": "0.1.19",
     "angular-resource": "1.6.0",
     "angular-smart-table": "2.1.8",
