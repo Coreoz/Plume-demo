@@ -7,6 +7,9 @@ This project makes use of the Plume ecosystem main modules:
 - [Plume Admin UI AngularJS](https://github.com/Coreoz/Plume-admin-ui-angularjs): a JavaScript frontend for Plume Admin written with AngularJS.
 - [Plume File](https://github.com/Coreoz/Plume-file): a group of modules to manage files
 
+/!\ Note that the JS frontend AngularJS application is updated only to the minimum to get the demo working.
+To build an admin frontend, you should use React or the latest version of Angular.
+
 Running the application
 -----------------------
 Just launch the `org.plume.demo.WebApplication` class and open <http://localhost:8080/> in your browser.

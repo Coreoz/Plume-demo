@@ -9,15 +9,15 @@ import org.glassfish.jersey.process.internal.RequestScoped;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import com.coreoz.plume.admin.jersey.feature.AdminSecurityFeature;
-import com.coreoz.plume.admin.webservices.context.WebSessionAdminFactory;
-import com.coreoz.plume.admin.webservices.security.WebSessionAdmin;
+import com.coreoz.plume.admin.websession.WebSessionAdmin;
 import com.coreoz.plume.admin.websession.WebSessionPermission;
+import com.coreoz.plume.admin.websession.jersey.WebSessionAdminFactory;
 import com.coreoz.plume.file.gallery.webservices.FileGalleryAdminWs;
 import com.coreoz.plume.file.webservices.FileWs;
+import com.coreoz.plume.jersey.errors.WsJacksonJsonProvider;
 import com.coreoz.plume.jersey.errors.WsResultExceptionMapper;
 import com.coreoz.plume.jersey.java8.TimeParamProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 
 /**
  * Jersey configuration
@@ -48,13 +48,16 @@ public class JerseyConfigProvider implements Provider<ResourceConfig> {
 			}
 		});
 
+		// Plume file/Plume gallery are not yet compatible with this feature
+		// config.register(RequireExplicitAccessControlFeature.accessControlAnnotations(PublicApi.class, RestrictToAdmin.class));
+
 		// filters configuration
 		// handle errors and exceptions
 		config.register(WsResultExceptionMapper.class);
 		// admin web-services protection with the permission system
 		config.register(AdminSecurityFeature.class);
 		// to debug web-service requests
-		// register(LoggingFilter.class);
+		// register(LoggingFeature.class);
 
 		// java 8
 		config.register(TimeParamProvider.class);
@@ -64,7 +67,7 @@ public class JerseyConfigProvider implements Provider<ResourceConfig> {
 		config.property("jersey.config.server.wadl.disableWadl", true);
 
 		// jackson mapper configuration
-		JacksonJaxbJsonProvider jacksonProvider = new JacksonJaxbJsonProvider();
+		WsJacksonJsonProvider jacksonProvider = new WsJacksonJsonProvider();
 		jacksonProvider.setMapper(objectMapper);
 		config.register(jacksonProvider);
 	}

@@ -11,6 +11,7 @@ import javax.ws.rs.core.MediaType;
 
 import com.coreoz.demo.services.configuration.ConfigurationService;
 import com.coreoz.demo.webservices.api.data.Test;
+import com.coreoz.plume.jersey.security.permission.PublicApi;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,6 +21,7 @@ import io.swagger.annotations.ApiParam;
 @Api("Manage exemple web-services")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@PublicApi
 @Singleton
 public class ExampleWs {
 

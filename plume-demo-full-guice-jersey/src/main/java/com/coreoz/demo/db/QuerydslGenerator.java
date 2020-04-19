@@ -80,8 +80,8 @@ public class QuerydslGenerator {
 
 	private static Type<?> classType(Class<?> classType) {
 		try {
-			return (Type<?>) classType.newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
+			return (Type<?>) classType.getConstructor().newInstance();
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}

@@ -8,10 +8,10 @@ import com.coreoz.demo.services.file.ProjectFileTypesProvider;
 import com.coreoz.demo.services.gallery.ProjectFileGalleryTypesAdminProvider;
 import com.coreoz.demo.webservices.admin.permissions.ProjectAdminPermissionService;
 import com.coreoz.plume.admin.guice.GuiceAdminWsModule;
-import com.coreoz.plume.admin.jersey.feature.WebSessionClassProvider;
 import com.coreoz.plume.admin.services.permissions.AdminPermissionService;
-import com.coreoz.plume.admin.webservices.security.WebSessionAdminProvider;
-import com.coreoz.plume.admin.webservices.security.WebSessionProvider;
+import com.coreoz.plume.admin.websession.JwtSessionSigner;
+import com.coreoz.plume.admin.websession.JwtSessionSignerProvider;
+import com.coreoz.plume.admin.websession.WebSessionSigner;
 import com.coreoz.plume.conf.guice.GuiceConfModule;
 import com.coreoz.plume.db.guice.DataSourceModule;
 import com.coreoz.plume.db.querydsl.guice.GuiceQuerydslModule;
@@ -35,8 +35,8 @@ public class ApplicationModule extends AbstractModule {
 		install(new GuiceQuerydslModule());
 		// admin module
 		install(new GuiceAdminWsModule());
-		bind(WebSessionProvider.class).to(WebSessionAdminProvider.class);
-		bind(WebSessionClassProvider.class).to(WebSessionAdminProvider.class);
+		bind(WebSessionSigner.class).toProvider(JwtSessionSignerProvider.class);
+		bind(JwtSessionSigner.class).toProvider(JwtSessionSignerProvider.class);
 		bind(AdminPermissionService.class).to(ProjectAdminPermissionService.class);
 
 		// database setup for the demo

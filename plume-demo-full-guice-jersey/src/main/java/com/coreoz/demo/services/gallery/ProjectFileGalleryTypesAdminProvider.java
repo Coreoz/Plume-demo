@@ -4,8 +4,7 @@ import java.util.Collection;
 
 import com.coreoz.plume.file.gallery.webservices.permissions.FileGalleryTypeAdmin;
 import com.coreoz.plume.file.gallery.webservices.permissions.FileGalleryTypesAdminProvider;
-
-import jersey.repackaged.com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList;
 
 public class ProjectFileGalleryTypesAdminProvider implements FileGalleryTypesAdminProvider {
 

@@ -16,6 +16,7 @@ import com.coreoz.plume.admin.services.permissions.AdminPermissions;
 import com.coreoz.plume.admin.webservices.SessionWs;
 import com.coreoz.plume.admin.websession.WebSessionPermission;
 import com.coreoz.plume.jersey.security.basic.BasicAuthenticator;
+import com.coreoz.plume.jersey.security.permission.PublicApi;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableSet;
 
@@ -36,6 +37,7 @@ import io.swagger.util.Json;
  * 	=> for example: "Bearer plkok.sqdqsdsqd.cqsdsd"
  */
 @Path("/swaggerAdmin")
+@PublicApi
 @Singleton
 public class SwaggerAdminWs {
 
