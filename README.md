@@ -1,4 +1,4 @@
-**⚠️ This repository is not maintained anymore. AngularJs should not be used for any new project. This sample [Plume Admin](https://github.com/Coreoz/Plume) project will be replaced with a React sample project ⚠️**
+**⚠️ This repository is not maintained anymore. AngularJs should not be used for any new project. This sample [Plume Admin](https://github.com/Coreoz/Plume) project is replaced by [Plume Showcase](https://github.com/Coreoz/Plume-showcase) ⚠️**
 
 Plume Demo
 ==========
