@@ -1,3 +1,5 @@
+**⚠️ This projet has been replaced by https://github.com/Coreoz/Plume-showcase ⚠️**
+
 A demo application of the whole Plume ecosystem
 ===============================================
 
